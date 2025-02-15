@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Introduction to Wazuh
-date: 2025-15-02 19:26:00
+date: 2025-02-02 19:26:00
 categories: [dfir, tutorial]
 ---
 
