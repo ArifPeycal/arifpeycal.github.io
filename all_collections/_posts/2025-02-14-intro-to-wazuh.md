@@ -5,8 +5,6 @@ date: 2025-02-14 19:26:00
 categories: [dfir, tutorial]
 ---
 
-![image](https://github.com/user-attachments/assets/5b01ab40-cbd2-453a-a512-3066ce7b2e30)
-
 ![image](https://github.com/user-attachments/assets/7578cdda-149a-44ca-817f-71a95db24243)
 
 
@@ -20,16 +18,18 @@ One of the key features of Wazuh is its ability to detect intrusions and respond
 
 ## **Wazuh Components**  
 
-Wazuh is made up of several key components that work together to collect, analyze, and visualize security data:  
+There are several components in Wazuh that work together to provide SIEM + XDR capabilities.  
 
-### **1. Wazuh Manager**  
+![image](https://github.com/user-attachments/assets/bae191e1-596f-43f1-b8fc-8690a4b63ea1)
+
+### **1. Wazuh Manager (Server) **  
 This is the core of Wazuh. It processes data from agents, applies security rules, and generates alerts. The manager is responsible for log analysis, file integrity monitoring, intrusion detection, and compliance checks.  
 
 ### **2. Wazuh Agents**  
-Agents are installed on the endpoints (servers, desktops, cloud instances, etc.) to collect security data and send it to the Wazuh Manager. They monitor logs, file changes, and system activity to detect threats.  
+Agents are installed on the endpoints like servers, desktops, cloud instances, etc. The agents will collect security data and send it to the Wazuh Manager. They monitor logs, file changes, and system activity to detect threats.  
 
-### **3. Wazuh Indexer (Based on OpenSearch)**  
-The indexer stores and indexes security data for efficient searching and analysis. It replaces Elasticsearch in newer Wazuh versions and is optimized for performance and scalability.  
+### **3. Wazuh Indexer **  
+The indexer stores and indexes security data for efficient searching and analysis.  The Wazuh Indexer is like a huge filing cabinet where all reports are stored and allows users to find past incidents quickly by searching through old reports.
 
 ### **4. Wazuh Dashboard (Kibana UI)**  
 The dashboard provides a graphical interface for analyzing logs, viewing alerts, and managing security events. It's built on Kibana and offers real-time insights into system security.  
