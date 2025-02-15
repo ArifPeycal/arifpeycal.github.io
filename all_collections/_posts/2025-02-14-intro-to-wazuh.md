@@ -5,9 +5,16 @@ date: 2025-02-14 19:26:00
 categories: [dfir, tutorial]
 ---
 
-**Introduction to Wazuh: A Powerful Security Monitoring Tool & How to Set It Up**  
+![image](https://github.com/user-attachments/assets/5b01ab40-cbd2-453a-a512-3066ce7b2e30)
 
-If you're into cybersecurity and looking for a solid open-source SIEM (Security Information and Event Management) tool, Wazuh is worth checking out. It helps with threat detection, compliance monitoring, and incident response. Whether you're securing a small network or a big enterprise, Wazuh offers flexibility and scalability, plus it integrates well with tools like the Elastic Stack for better data visualization.  
+![image](https://github.com/user-attachments/assets/7578cdda-149a-44ca-817f-71a95db24243)
+
+
+If you're into cybersecurity and want a simple yet powerful way to monitor and manage your network's security, you might want to check out Wazuh. It's an open-source security information and event management (SIEM) tool that does a lot of the heavy lifting when it comes to detecting threats, compliance monitoring, and incident response.
+
+Wazuh is all about helping you monitor your systems for any signs of malicious activity. It collects logs from different sources like servers, applications, and firewalls, and then analyzes them for suspicious patterns. What's cool is that it's designed to work well on a variety of platforms, including Linux, Windows, and even cloud environments.
+
+One of the key features of Wazuh is its ability to detect intrusions and respond to them, kinda XDR-like capabilities. It uses things like file integrity monitoring, real-time alerts and active response to make sure the system is running smoothly. It’s also handy for compliance because it can help you meet regulations like PCI-DSS, HIPAA, or GDPR by tracking and reporting on security events that are relevant to those standards.
 
 ---
 
