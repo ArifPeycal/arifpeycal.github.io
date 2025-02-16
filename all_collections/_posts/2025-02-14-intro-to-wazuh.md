@@ -31,7 +31,7 @@ Agents are installed on the endpoints like servers, desktops, cloud instances, e
 ### **3. Wazuh Indexer**  
 The indexer stores and indexes security data for efficient searching and analysis.  The Wazuh Indexer is like a huge filing cabinet where all reports are stored and allows users to find past incidents quickly by searching through old reports.
 
-### **4. Wazuh Dashboard (Kibana UI)**  
+### **4. Wazuh Dashboard**  
 The dashboard provides a graphical interface for analyzing logs, viewing alerts, and managing security events. It's built on Kibana and offers real-time insights into system security.  
 
 ### **5. Wazuh API**  
@@ -42,19 +42,19 @@ The API allows integration with other security tools and automation of tasks. It
 ## **Setting Up Wazuh**  
 
 Setting up Wazuh might seem complex at first, but once you break it down, it’s pretty straightforward.  
-
+<!--
 The system infrastructure for this setup consists of three main components: Wazuh Manager, DVWA (Damn Vulnerable Web Application), and Kali Linux. The Wazuh Manager is installed on an Ubuntu virtual machine (VM) and collects logs from the agents. This Ubuntu VM also hosts DVWA to test security flaws such as SQL Injection, Cross-Site Scripting (XSS), and brute-force attacks.
 
 On the attacker side, Kali Linux is used to simulate attacks on DVWA. Kali is loaded with various penetration testing tools like SQLmap, Hydra, and Burp Suite, which help in executing security attacks to evaluate the effectiveness of Wazuh’s monitoring. Wazuh detects and alerts on attacks by analyzing web server logs, system logs, and application logs on the Ubuntu VM.
-
-### **Step 1: Install Wazuh Manager, Dashboard (Ubuntu VM)**  
+-->
+### **Quick Install Wazuh Manager, Dashboard, Indexer etc**  
 The Wazuh Manager is the core component responsible for processing data and generating alerts. Wazuh Dashboard allows you to interact using interactive web interface. 
 
 1. Update your system:  
    ```bash
    sudo apt update && sudo apt upgrade -y
    ```
-2. Add the Wazuh repository and install the Wazuh Manager:  
+2. Add the Wazuh repository and install the Wazuh Manager. This command will install central components of Wazuh including Manager, Indexer, Dashboard and Filebeat.  
    ```bash
    curl -sO https://packages.wazuh.com/4.10/wazuh-install.sh  
    sudo bash wazuh-install.sh -a  
@@ -71,7 +71,7 @@ The Wazuh Manager is the core component responsible for processing data and gene
 You have succesfully installed Wazuh!
 
 ![image](https://github.com/user-attachments/assets/64f98515-4a48-4cb4-942f-ea6e28b4058f)
-
+<!--
 ### Step 2: Install DVWA (Ubuntu VM)
 We will use Docker to install DVWA quickly.
 
@@ -89,8 +89,51 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 
 ![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
 
-
+![image](https://github.com/user-attachments/assets/5350e20f-34b3-4962-86e2-2775235281d8) 
+![image](https://github.com/user-attachments/assets/5155f1b5-de11-4586-aa93-8a403f120951)
+-->
 ---
+
+## POC
+
+Now, we can test the functionality of Wazuh in detecting threats and attacks. 
+
+### 1. SQL Injection Attack
+
+SQL Injection (SQLi) is a type of attack where an attacker injects malicious SQL code into an input field (like a login form or search bar). This can allow attackers to bypass authentication, steal data, or even delete entire databases. 
+
+Wazuh default rules can detect any attempts of SQLi by analyzing web server logs (Apache, Nginx etc). 
+
+1. Install Apache web server:
+   ```bash
+   sudo apt install apache2
+   ```
+2. Check the status of the Apache service to verify that the web server is running:
+   ```bash
+   sudo systemctl status apache2
+   ```
+3. Add the following configurations under `<ossec_config>` tag to the `/var/ossec/etc/ossec.conf` file. This allows the Wazuh agent to monitor the access logs of your Apache server:
+
+   ```
+     <localfile>
+       <log_format>apache</log_format>
+       <location>/var/log/apache2/access.log</location>
+     </localfile>
+   ```
+4. Access the Apache webpage from attacker machine, in this case I'm using Kali Linux. 
+   ```bash
+   curl -XGET http://192.168.245.131/users/?id=SELECT%20*%20FROM%20users;
+   ```
+5. Navigate to Overview page, we can see there is one SQLi alert detected by Wazuh from IP address `192.168.245.131` which is the Kali Linux VM.
+   
+![image](https://github.com/user-attachments/assets/8a98f777-9615-4194-a63d-c85ab04b07ce)
+
+There is also page specifically for MITRE ATT&CK which it lists out events and its associated MITRE ATT&CK ID and tactics.
+
+![image](https://github.com/user-attachments/assets/bf70d46a-d7ca-4345-b015-af50ab170da1)
+
+
+
 
 ## **Wrapping Up**  
 Wazuh is a powerful yet free tool for security monitoring. With its components working together, it provides deep insights into system security, detects threats, and ensures compliance. Once set up, you can start analyzing logs, detecting intrusions, and keeping your infrastructure secure. If you're serious about cybersecurity, Wazuh is definitely worth adding to your toolkit! 🚀
