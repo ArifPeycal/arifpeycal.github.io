@@ -19,7 +19,6 @@ One of the key features of Wazuh is its ability to detect intrusions and respond
 ## **Wazuh Components**  
 
 There are several components in Wazuh that work together to provide SIEM + XDR capabilities.  
-
 ![image](https://github.com/user-attachments/assets/bae191e1-596f-43f1-b8fc-8690a4b63ea1)
 
 ### **1. Wazuh Manager (Server)**  
@@ -69,7 +68,6 @@ The Wazuh Manager is the core component responsible for processing data and gene
    ```
 
 You have succesfully installed Wazuh!
-
 ![image](https://github.com/user-attachments/assets/64f98515-4a48-4cb4-942f-ea6e28b4058f)
 <!--
 ### Step 2: Install DVWA (Ubuntu VM)
@@ -125,14 +123,82 @@ Wazuh default rules can detect any attempts of SQLi by analyzing web server logs
    curl -XGET http://192.168.245.131/users/?id=SELECT%20*%20FROM%20users;
    ```
 5. Navigate to Overview page, we can see there is one SQLi alert detected by Wazuh from IP address `192.168.245.131` which is the Kali Linux VM.
-   
 ![image](https://github.com/user-attachments/assets/8a98f777-9615-4194-a63d-c85ab04b07ce)
 
 There is also page specifically for MITRE ATT&CK which it lists out events and its associated MITRE ATT&CK ID and tactics.
-
 ![image](https://github.com/user-attachments/assets/bf70d46a-d7ca-4345-b015-af50ab170da1)
 
+### 2. Monitoring Execution of Malicious Commands
 
+Monitoring user's commands is very important to detect any suspicious commands executed on a Linux machine. Wazuh, combined with Auditd, provides an efficient way to monitor and detect potentially harmful commands executed on a system that can lead to privilege escalation and unauthorized software execution. 
+
+1. Install and configure Auditd. It allows us to log system calls and monitor command executions in real time. To install and enable Auditd, run the following commands:
+   ```bash
+   sudo apt -y install auditd
+   sudo systemctl start auditd
+   sudo systemctl enable auditd
+   ```
+
+2. Append audit rules to track command executions. These rules log all commands run by users with a specific UID, helping us keep an eye on activities that may indicate an attack. Run the following commands as root to modify the `/etc/audit/audit.rules` file:
+
+```bash
+echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b32 -S execve -k audit-wazuh-c" >> /etc/audit/audit.rules
+echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b64 -S execve -k audit-wazuh-c" >> /etc/audit/audit.rules
+```
+
+3. For Wazuh to monitor Auditd logs, we need to configure the Wazuh agent to read from `/var/log/audit/audit.log`. Open and modify the `/var/ossec/etc/ossec.conf` file on the Wazuh agent:
+
+   ```xml
+   <localfile>
+     <log_format>audit</log_format>
+     <location>/var/log/audit/audit.log</location>
+   </localfile>
+   ```
+
+4. Save the changes and restart the Wazuh manager:
+
+   ```bash
+   sudo systemctl restart wazuh-manager
+   ```
+
+5. Define a list of potentially malicious commands. This list allows Wazuh to match executed commands and generate alerts accordingly. Create the file `/var/ossec/etc/lists/suspicious-programs` and add key-value pair according to your need. The value can be used to filter the alert according to the severity level:
+
+   ```
+   ncat:yellow
+   nc:red
+   sudo:red
+   chmod:red
+   ```
+
+6. To make Wazuh recognize this list, add it to the `<ruleset>` section of the Wazuh server’s `/var/ossec/etc/ossec.conf` file:
+
+   ```xml
+   <list>etc/lists/suspicious-programs</list>
+   ```
+
+7. Create a custom rule to trigger alerts when commands in our list are executed. Edit the `/var/ossec/etc/rules/local_rules.xml` file and add the following rule:
+
+   ```xml
+   <group name="audit">
+     <rule id="100210" level="12">
+       <if_sid>80792</if_sid>
+       <list field="audit.command" lookup="match_key_value" check_value="red">etc/lists/suspicious-programs</list>
+       <description>Audit: Highly Suspicious Command executed: $(audit.exe)</description>
+       <group>audit_command,</group>
+     </rule>
+   </group>
+   ```
+
+8. Restart the Wazuh manager to apply the changes:
+
+   ```bash
+   sudo systemctl restart wazuh-manager
+   ```
+
+9. Test the alert rules by executing a known "red" program such as `ncat` and `sudo`:
+![image](https://github.com/user-attachments/assets/2a272a8d-1693-46ac-a00a-305704f61c43)
+
+![image](https://github.com/user-attachments/assets/fe1e169d-ad4b-4e63-8975-82b76387b48b)
 
 
 ## **Wrapping Up**  
