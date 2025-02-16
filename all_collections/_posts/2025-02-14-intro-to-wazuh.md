@@ -47,8 +47,8 @@ The system infrastructure for this setup consists of three main components: Wazu
 
 On the attacker side, Kali Linux is used to simulate attacks on DVWA. Kali is loaded with various penetration testing tools like SQLmap, Hydra, and Burp Suite, which help in executing security attacks to evaluate the effectiveness of Wazuh’s monitoring. Wazuh detects and alerts on attacks by analyzing web server logs, system logs, and application logs on the Ubuntu VM.
 
-### **Step 1: Install Wazuh Manager (Ubuntu VM)**  
-The Wazuh Manager is the core component responsible for processing data and generating alerts. You’ll need a Linux machine (Ubuntu, Debian, or CentOS recommended).  
+### **Step 1: Install Wazuh Manager, Dashboard (Ubuntu VM)**  
+The Wazuh Manager is the core component responsible for processing data and generating alerts. Wazuh Dashboard allows you to interact using interactive web interface. 
 
 1. Update your system:  
    ```bash
@@ -56,28 +56,23 @@ The Wazuh Manager is the core component responsible for processing data and gene
    ```
 2. Add the Wazuh repository and install the Wazuh Manager:  
    ```bash
-   curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh  
-   sudo bash wazuh-install.sh --wazuh-manager  
+   curl -sO https://packages.wazuh.com/4.10/wazuh-install.sh  
+   sudo bash wazuh-install.sh -a  
    ```
-3. Start and enable the Wazuh Manager service:  
+3. Access the Wazuh web interface with https://<WAZUH_DASHBOARD_IP_ADDRESS> and your credentials:  
    ```bash
-   sudo systemctl enable --now wazuh-manager  
+   INFO: --- Summary ---
+   INFO: You can access the web interface https://<WAZUH_DASHBOARD_IP_ADDRESS>
+   User: admin
+   Password: <ADMIN_PASSWORD>
+   INFO: Installation finished.   
    ```
 
-### **Step 2: Install Wazuh Dashboard (Ubuntu VM)**  
-For a user-friendly interface, Wazuh integrates with **Elastic Stack** (Elasticsearch, Logstash, Kibana).  
+You have succesfully installed Wazuh!
 
-1. Install the Wazuh Dashboard:  
-   ```bash
-   sudo bash wazuh-install.sh --wazuh-dashboard  
-   ```
-2. Start the service:  
-   ```bash
-   sudo systemctl enable --now wazuh-dashboard  
-   ```
-3. Access the dashboard by going to `http://<your-server-ip>:5601` in your browser.
+![image](https://github.com/user-attachments/assets/64f98515-4a48-4cb4-942f-ea6e28b4058f)
 
-### Step 3: Install DVWA (Ubuntu VM)
+### Step 2: Install DVWA (Ubuntu VM)
 We will use Docker to install DVWA quickly.
 
 1. Install Docker & Pull DVWA Image
@@ -92,30 +87,9 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 ```
 3. DVWA will now be accessible at: http://[Ubuntu_VM_IP]/
 
-### **Step 4: Install Wazuh Agent (Ubuntu VM)**  
-The Wazuh Agent collects data from the machine it's installed on and sends it to the Wazuh Manager.  
+![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
 
-1. Add the Wazuh repository:  
-   ```bash
-   curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh  
-   sudo bash wazuh-install.sh --wazuh-agent  
-   ```
-2. Configure the agent to connect to the Wazuh Manager:  
-   ```bash
-   sudo nano /var/ossec/etc/ossec.conf  
-   ```
-3. Find this section and set the manager IP to 127.0.0.1 (since it's the same machine):
-   ```xml
-   <server>
-     <address>127.0.0.1</address>
-   </server>
-   ```
 
-4. Restart the agent: 
-   ```bash
-   sudo systemctl restart wazuh-agent
-   sudo systemctl enable --now wazuh-agent  
-   ```
 ---
 
 ## **Wrapping Up**  
