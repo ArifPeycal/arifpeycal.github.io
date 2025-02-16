@@ -41,6 +41,8 @@ The API allows integration with other security tools and automation of tasks. It
 ## **Setting Up Wazuh**  
 
 Setting up Wazuh might seem complex at first, but once you break it down, it’s pretty straightforward.  
+
+> Disclaimer: For this blog, I’ll be setting up Wazuh without an agent, well at least not yet. I will just use the Wazuh server to explore and learn some of its functionalities. This is purely for testing and getting familiar with how things work. In the next blog, I’ll go deeper and deploy an agent for full monitoring. Stay tuned!
 <!--
 The system infrastructure for this setup consists of three main components: Wazuh Manager, DVWA (Damn Vulnerable Web Application), and Kali Linux. The Wazuh Manager is installed on an Ubuntu virtual machine (VM) and collects logs from the agents. This Ubuntu VM also hosts DVWA to test security flaws such as SQL Injection, Cross-Site Scripting (XSS), and brute-force attacks.
 
