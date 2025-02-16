@@ -49,16 +49,19 @@ On the attacker side, Kali Linux is used to simulate attacks on DVWA. Kali is lo
 ### **Quick Install Wazuh Manager, Dashboard, Indexer etc**  
 The Wazuh Manager is the core component responsible for processing data and generating alerts. Wazuh Dashboard allows you to interact using interactive web interface. 
 
-1. Update your system:  
+1. Update your system:
+   
    ```bash
    sudo apt update && sudo apt upgrade -y
    ```
-2. Add the Wazuh repository and install the Wazuh Manager. This command will install central components of Wazuh including Manager, Indexer, Dashboard and Filebeat.  
+2. Add the Wazuh repository and install the Wazuh Manager. This command will install central components of Wazuh including Manager, Indexer, Dashboard and Filebeat.
+   
    ```bash
    curl -sO https://packages.wazuh.com/4.10/wazuh-install.sh  
    sudo bash wazuh-install.sh -a  
    ```
-3. Access the Wazuh web interface with https://<WAZUH_DASHBOARD_IP_ADDRESS> and your credentials:  
+3. Access the Wazuh web interface with https://<WAZUH_DASHBOARD_IP_ADDRESS> and your credentials:
+   
    ```bash
    INFO: --- Summary ---
    INFO: You can access the web interface https://<WAZUH_DASHBOARD_IP_ADDRESS>
@@ -107,6 +110,7 @@ Wazuh default rules can detect any attempts of SQLi by analyzing web server logs
    sudo apt install apache2
    ```
 2. Check the status of the Apache service to verify that the web server is running:
+
    ```bash
    sudo systemctl status apache2
    ```
@@ -118,7 +122,8 @@ Wazuh default rules can detect any attempts of SQLi by analyzing web server logs
        <location>/var/log/apache2/access.log</location>
      </localfile>
    ```
-4. Access the Apache webpage from attacker machine, in this case I'm using Kali Linux. 
+4. Access the Apache webpage from attacker machine, in this case I'm using Kali Linux.
+   
    ```bash
    curl -XGET http://192.168.245.131/users/?id=SELECT%20*%20FROM%20users;
    ```
@@ -132,14 +137,15 @@ There is also page specifically for MITRE ATT&CK which it lists out events and i
 
 Monitoring user's commands is very important to detect any suspicious commands executed on a Linux machine. Wazuh, combined with Auditd, provides an efficient way to monitor and detect potentially harmful commands executed on a system that can lead to privilege escalation and unauthorized software execution. 
 
-1. Install and configure Auditd. It allows us to log system calls and monitor command executions in real time. To install and enable Auditd, run the following commands:
+1. Install and configure Auditd. It allows us to log system calls and monitor command executions in real time.
+   
    ```bash
    sudo apt -y install auditd
    sudo systemctl start auditd
    sudo systemctl enable auditd
    ```
 
-2. Append audit rules to track command executions. These rules log all commands run by users with a specific UID, helping us keep an eye on activities that may indicate an attack. Run the following commands as root to modify the `/etc/audit/audit.rules` file:
+2. Append audit rules to `/etc/audit/audit.rules` as root to track command executions. These rules will log all commands executed by user 1000 (excluding EGID 994) and assign them the key "audit-wazuh-c":
 
 ```bash
 echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b32 -S execve -k audit-wazuh-c" >> /etc/audit/audit.rules
@@ -155,13 +161,7 @@ echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b64 -S execve
    </localfile>
    ```
 
-4. Save the changes and restart the Wazuh manager:
-
-   ```bash
-   sudo systemctl restart wazuh-manager
-   ```
-
-5. Define a list of potentially malicious commands. This list allows Wazuh to match executed commands and generate alerts accordingly. Create the file `/var/ossec/etc/lists/suspicious-programs` and add key-value pair according to your need. The value can be used to filter the alert according to the severity level:
+4. Define a list of potentially malicious commands. This list allows Wazuh to match executed commands and generate alerts accordingly. Create the file `/var/ossec/etc/lists/suspicious-programs` and add key-value pair according to your need. The value can be used to filter the alert according to the severity level:
 
    ```
    ncat:yellow
@@ -170,13 +170,13 @@ echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b64 -S execve
    chmod:red
    ```
 
-6. To make Wazuh recognize this list, add it to the `<ruleset>` section of the Wazuh server’s `/var/ossec/etc/ossec.conf` file:
+5. To make Wazuh recognize this list, add it to the `<ruleset>` section of the Wazuh server’s `/var/ossec/etc/ossec.conf` file:
 
    ```xml
    <list>etc/lists/suspicious-programs</list>
    ```
 
-7. Create a custom rule to trigger alerts when commands in our list are executed. Edit the `/var/ossec/etc/rules/local_rules.xml` file and add the following rule:
+6. Create a custom rule to trigger alerts when commands in our list are executed. Edit the `/var/ossec/etc/rules/local_rules.xml` file and add the following rule:
 
    ```xml
    <group name="audit">
@@ -189,7 +189,7 @@ echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b64 -S execve
    </group>
    ```
 
-8. Restart the Wazuh manager to apply the changes:
+7. Restart the Wazuh manager to apply the changes:
 
    ```bash
    sudo systemctl restart wazuh-manager
