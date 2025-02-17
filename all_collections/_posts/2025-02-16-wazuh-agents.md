@@ -181,8 +181,32 @@ By default, the Wazuh Rootcheck module is enabled in the Wazuh agent’s configu
 </rootcheck>
 ```
 
-This configuration ensures that Rootcheck actively monitors files, system processes, and trojanized binaries.
+If we look at `/var/ossec/etc/shared/rootkit_trojans.txt`, we can see several commands that become signature of trojans to do malicious activities when being executed.
+```
+# Common binaries and public trojan entries
+ls          !bash|^/bin/sh|dev/[^clu]|\.tmp/lsfile|duarawkz|/prof|/security|file\.h!
+env         !bash|^/bin/sh|file\.h|proc\.h|/dev/|^/bin/.*sh!
+echo        !bash|^/bin/sh|file\.h|proc\.h|/dev/[^cl]|^/bin/.*sh!
+chown       !bash|^/bin/sh|file\.h|proc\.h|/dev/[^cl]|^/bin/.*sh!
+chmod       !bash|^/bin/sh|file\.h|proc\.h|/dev/[^cl]|^/bin/.*sh!
+chgrp       !bash|^/bin/sh|file\.h|proc\.h|/dev/[^cl]|^/bin/.*sh!
+cat         !bash|^/bin/sh|file\.h|proc\.h|/dev/[^cl]|^/bin/.*sh!
+bash        !proc\.h|/dev/[0-9]|/dev/[hijkz]!
+```
 
+On the other hand, `/var/ossec/etc/shared/rootkit_files.txt` contains a list of known trojan-related files that Wazuh Rootcheck scans for on monitored endpoints. This list helps detect the presence of malicious files commonly associated with rootkits.
+```
+# Bash door
+tmp/mcliZokhb           ! Bash door ::/rootkits/bashdoor.php
+tmp/mclzaKmfa           ! Bash door ::/rootkits/bashdoor.php
+
+# adore Worm
+dev/.shit/red.tgz       ! Adore Worm ::/rootkits/adorew.php
+usr/lib/libt            ! Adore Worm ::/rootkits/adorew.php
+usr/bin/adore           ! Adore Worm ::/rootkits/adorew.php
+*/klogd.o               ! Adore Worm ::/rootkits/adorew.php
+*/red.tar               ! Adore Worm ::/rootkits/adorew.php
+```
 ### Simulating a Suspicious Binary Attack
 
 1. First, create a backup of an existing system binary before modifying it:
