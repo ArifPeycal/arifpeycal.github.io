@@ -2,7 +2,7 @@
 layout: post
 title: Setting Up Wazuh Agent
 date: 2025-02-16 19:26:00
-categories: [dfir, tutorial]
+categories: [dfir, wazuh, tutorial]
 ---
 
 In my previous post, I explored Wazuh without an agent, just to get a feel for how things work. Now, it’s time to level up and deploy the Wazuh agent on an **Ubuntu VM** to start monitoring system activities properly. This guide will walk through the setup process step by step.  
