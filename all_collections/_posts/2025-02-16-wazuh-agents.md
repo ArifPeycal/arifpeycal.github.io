@@ -19,10 +19,10 @@ Before we begin, make sure:
 ---
 
 ## Step 1: Install the Wazuh Agent
-First, access the Wazuh Dashboard using `https://WAZUH-MANAGER-IP`, make sure you remember the login credentials.
+First, access the Wazuh Dashboard using `https://WAZUH-MANAGER-IP`, make sure you remember the login credentials. On the Homepage, click the Deploy Agent button and follow the instructions.
 ![image](https://github.com/user-attachments/assets/2fbca750-be9a-479a-9422-ee80b073676b)
 
-On the Homepage, click the Deploy Agent button and follow the instructions. You need to choose correct package according to the agent's OS. In my case, I am using Ubuntu so I choose `amd64`.
+You need to choose correct package according to the agent's OS. In my case, I am using Ubuntu so I choose `amd64`.
 ![image](https://github.com/user-attachments/assets/491f4875-7837-4a7a-b09b-7737fdc0705c)
 
 There are several things that you need to configure such as agent name and server IP. Then, copy and run the command in the agent VM.
