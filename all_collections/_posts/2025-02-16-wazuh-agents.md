@@ -5,12 +5,6 @@ date: 2025-02-16 19:26:00
 categories: [dfir, tutorial]
 ---
 
-Here's a blog post for setting up the Wazuh agent on an Ubuntu VM. Let me know if you want any changes!  
-
----
-
-# Setting Up Wazuh Agent on Ubuntu VM  
-
 In my previous post, I explored Wazuh without an agent, just to get a feel for how things work. Now, it’s time to level up and deploy the Wazuh agent on an **Ubuntu VM** to start monitoring system activities properly. This guide will walk through the setup process step by step.  
 
 ---
@@ -165,9 +159,5 @@ For the compliance part, I look up to alert by PCI-DSS Requirement 11.5 which me
 
 ## 🎯 Conclusion  
 That’s it! Your Ubuntu VM is now running the Wazuh agent and sending logs to the manager. In the next post, I'll explore how to fine-tune the agent and set up rules for detecting **suspicious activity** like XSS and SQLi. Stay tuned!  
+ 
 
-Let me know if you have any questions or issues in the comments. 🚀  
-
----
-
-Want any modifications? 😃
