@@ -20,7 +20,7 @@ First, access the Wazuh Dashboard using `https://WAZUH-MANAGER-IP`, make sure yo
 
 ![image](https://github.com/user-attachments/assets/2fbca750-be9a-479a-9422-ee80b073676b)
 
-You need to choose correct package according to the agent's OS. In my case, I am using Ubuntu so I choose `amd64`.
+You need to choose correct package according to the agent's OS. In my case, I am using Ubuntu so I choose `DEB amd64`.
 ![image](https://github.com/user-attachments/assets/491f4875-7837-4a7a-b09b-7737fdc0705c)
 
 There are several things that you need to configure such as agent name and server IP. Then, copy and run the command in the agent VM.
@@ -88,13 +88,14 @@ This feature helps identify security weaknesses in your system by scanning for k
 From the dashboard, you see the vulnerabilities according to their severity levels. There is also lists of CVEs related to the agent which can help us to patch the vulnerabilities.
 
 For example, `CVE-2024-26458`, `CVE-2024-26461`, `CVE-2024-26462` related to Kerberos 5 1.21.2 that contains a memory leak vulnerability. 
+![image](https://github.com/user-attachments/assets/4894b3c5-2583-442f-8773-08cc239adea1)
+
 
 References:
 - https://ubuntu.com/security/CVE-2024-26458
 - https://ubuntu.com/security/CVE-2024-26461
 - https://ubuntu.com/security/CVE-2024-26462
 
-![image](https://github.com/user-attachments/assets/4894b3c5-2583-442f-8773-08cc239adea1)
 
 ## 3. File Monitoring 
 
@@ -145,8 +146,6 @@ I also tried modifying `/etc/passwd`, and Wazuh successfully detected the change
 For the compliance part, I look up to alert by PCI-DSS Requirement 11.5 which mentions about deploying file integrity monitoring to detect any malicious file changes.
 
 ![image](https://github.com/user-attachments/assets/8ce25fc5-9fd6-4fd3-96f2-059d4699bb79)
-
-
 
 
 ## 4. Detecting Suspicious Binaries
