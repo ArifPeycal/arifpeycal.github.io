@@ -14,12 +14,10 @@ Wazuh is all about helping you monitor your systems for any signs of malicious a
 
 One of the key features of Wazuh is its ability to detect intrusions and respond to them, kinda XDR-like capabilities. It uses things like file integrity monitoring, real-time alerts and active response to make sure the system is running smoothly. It’s also handy for compliance because it can help you meet regulations like PCI-DSS, HIPAA, or GDPR by tracking and reporting on security events that are relevant to those standards.
 
----
-
 ## **Wazuh Components**  
 
 There are several components in Wazuh that work together to provide SIEM + XDR capabilities.  
-![image](https://github.com/user-attachments/assets/bae191e1-596f-43f1-b8fc-8690a4b63ea1)
+![image](https://github.com/user-attachments/assets/1f673a1c-e823-4da8-b0f9-79982e7da7c9)
 
 ### **1. Wazuh Manager (Server)**  
 This is the core of Wazuh. It processes data from agents, applies security rules, and generates alerts. The manager is responsible for log analysis, file integrity monitoring, intrusion detection, and compliance checks.  
@@ -36,7 +34,6 @@ The dashboard provides a graphical interface for analyzing logs, viewing alerts,
 ### **5. Wazuh API**  
 The API allows integration with other security tools and automation of tasks. It enables users to interact with Wazuh programmatically, retrieve alerts, manage agents, and perform searches.  
 
----
 
 ## **Setting Up Wazuh**  
 
