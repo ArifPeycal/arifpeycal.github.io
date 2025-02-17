@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Setting Up Wazuh Agent
-date: 2025-02-17 19:26:00
+date: 2025-02-16 19:26:00
 categories: [dfir, tutorial]
 ---
 
