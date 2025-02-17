@@ -7,7 +7,6 @@ categories: [dfir, tutorial]
 
 In my previous post, I explored Wazuh without an agent, just to get a feel for how things work. Now, it’s time to level up and deploy the Wazuh agent on an **Ubuntu VM** to start monitoring system activities properly. This guide will walk through the setup process step by step.  
 
----
 
 ## 🛠 Prerequisites  
 Before we begin, make sure:  
@@ -16,10 +15,9 @@ Before we begin, make sure:
 
 ![image](https://github.com/user-attachments/assets/e2188b6f-21c5-42fb-bc00-00dda1b0f50f)
 
----
-
 ## Step 1: Install the Wazuh Agent
 First, access the Wazuh Dashboard using `https://WAZUH-MANAGER-IP`, make sure you remember the login credentials. On the Homepage, click the Deploy Agent button and follow the instructions.
+
 ![image](https://github.com/user-attachments/assets/2fbca750-be9a-479a-9422-ee80b073676b)
 
 You need to choose correct package according to the agent's OS. In my case, I am using Ubuntu so I choose `amd64`.
@@ -149,15 +147,75 @@ For the compliance part, I look up to alert by PCI-DSS Requirement 11.5 which me
 ![image](https://github.com/user-attachments/assets/8ce25fc5-9fd6-4fd3-96f2-059d4699bb79)
 
 
+
+
+## 4. Detecting Suspicious Binaries
+
+Wazuh provides malware detection capabilities to identify suspicious binaries such as trojan on an endpoint. A Trojan is a type of malware that disguises itself as a legitimate program to trick users into running it. Once executed, a Trojan can perform malicious actions such as stealing data, opening backdoors, or allowing attackers to gain unauthorized access to a system.
+
+Wazuh helps detect legitimate system binaries (usually at `/usr/bin/`) that have been modified to execute malicious code while still appearing normal. This allows security teams to identify and mitigate potential compromises.
+
+### Configuration
+   
+By default, the Wazuh Rootcheck module is enabled in the Wazuh agent’s configuration. To confirm this, check the `<rootcheck>` section in `/var/ossec/etc/ossec.conf` on the agent and ensure it includes the following configuration:
+
+```xml
+<rootcheck>
+    <disabled>no</disabled>
+    <check_files>yes</check_files>
+
+    <!-- Enable Trojan detection -->
+    <check_trojans>yes</check_trojans>
+
+    <check_dev>yes</check_dev>
+    <check_sys>yes</check_sys>
+    <check_pids>yes</check_pids>
+    <check_ports>yes</check_ports>
+    <check_if>yes</check_if>
+
+    <!-- Scan frequency: every 12 hours -->
+    <frequency>43200</frequency>
+    <rootkit_files>/var/ossec/etc/shared/rootkit_files.txt</rootkit_files>
+    <rootkit_trojans>/var/ossec/etc/shared/rootkit_trojans.txt</rootkit_trojans>
+    <skip_nfs>yes</skip_nfs>
+</rootcheck>
+```
+
+This configuration ensures that Rootcheck actively monitors files, system processes, and trojanized binaries.
+
+### Simulating a Suspicious Binary Attack
+
+1. First, create a backup of an existing system binary before modifying it:
+```bash
+sudo cp -p /usr/bin/w /usr/bin/w.copy
+```
+2. Replace the legitimate binary with a malicious script that performs unauthorized actions:
+```bash
+sudo tee /usr/bin/w << EOF
+#!/bin/bash
+echo "\$(date) - This is an evil script" > /tmp/trojan_created_file
+echo "Test for /usr/bin/w trojaned file" >> /tmp/trojan_created_file
+# Running the original binary
+/usr/bin/w.copy
+EOF
+```
+This script logs a fake message and then executes the original binary to maintain normal functionality, making it harder to detect.
+
+3. The Rootcheck scan runs every 12 hours by default, but you can force a scan immediately by restarting the Wazuh agent:
+```bash
+sudo systemctl restart wazuh-agent
+```
+4. Once the scan completes, Wazuh detects the modified binary and generates an alert. Navigate to the Threat Hunting module in the Wazuh dashboard.
 ![image](https://github.com/user-attachments/assets/c00475fa-9d6d-4303-a1d7-9dccbaa2fa86)
 
+You can also use the search filter to monitor specific alert:
+```
+location:rootcheck AND rule.id:510 AND data.title:Trojaned version of file detected.
+```
 ![image](https://github.com/user-attachments/assets/c61419e3-2669-4a24-8252-9a474e30afe8)
 
 
-
-
-
 ## 🎯 Conclusion  
-That’s it! Your Ubuntu VM is now running the Wazuh agent and sending logs to the manager. In the next post, I'll explore how to fine-tune the agent and set up rules for detecting **suspicious activity** like XSS and SQLi. Stay tuned!  
+That’s it! Ubuntu VM is now running the Wazuh agent and sending logs to the manager. In the next post, I'll explore how to do some integrations with third-party API such as VirusTotal for active response and maybe Discord for alert notifications. Stay tuned!  
  
 
