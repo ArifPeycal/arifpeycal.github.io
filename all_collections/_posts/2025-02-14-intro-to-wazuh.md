@@ -2,7 +2,7 @@
 layout: post
 title: Introduction to Wazuh
 date: 2025-02-14 19:26:00
-categories: [dfir, tutorial]
+categories: [dfir, wazuh, tutorial]
 ---
 
 ![image](https://github.com/user-attachments/assets/7578cdda-149a-44ca-817f-71a95db24243)
