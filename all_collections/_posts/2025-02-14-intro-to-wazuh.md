@@ -8,18 +8,48 @@ categories: [dfir, wazuh, tutorial]
 ![image](https://github.com/user-attachments/assets/7578cdda-149a-44ca-817f-71a95db24243)
 
 
-If you're into cybersecurity and want a simple yet powerful way to monitor and manage your network's security, you might want to check out Wazuh. It's an open-source security information and event management (SIEM) tool that does a lot of the heavy lifting when it comes to detecting threats, compliance monitoring, and incident response.
+If want a simple yet powerful way to monitor and manage your network's security, you might want to check out Wazuh. It's an open-source security information and event management (SIEM) tool that provides threat detection, compliance monitoring, and incident response for endpoints.
 
 Wazuh is all about helping you monitor your systems for any signs of malicious activity. It collects logs from different sources like servers, applications, and firewalls, and then analyzes them for suspicious patterns. What's cool is that it's designed to work well on a variety of platforms, including Linux, Windows, and even cloud environments.
 
-One of the key features of Wazuh is its ability to detect intrusions and respond to them, kinda XDR-like capabilities. It uses things like file integrity monitoring, real-time alerts and active response to make sure the system is running smoothly. It’s also handy for compliance because it can help you meet regulations like PCI-DSS, HIPAA, or GDPR by tracking and reporting on security events that are relevant to those standards.
+## **Key Features of Wazuh**
+1. **Intrusion Detection (HIDS & NIDS)**
+
+- Monitors system and network activity for suspicious behavior.
+- Uses rules to detect malicious activities, exploits, and unauthorized access.
+
+2. **File Integrity Monitoring (FIM)**
+
+- Detects changes in critical files or directories.
+- Helps detect unauthorized modifications or malware infections.
+
+3. **Log Data Analysis**
+
+- Collects and analyzes system logs, application logs, and network logs.
+- Detects security events like failed logins, privilege escalations, and brute-force attacks.
+
+4. **Malware & Anomaly Detection**
+
+- Scans for rootkits, trojans, and hidden processes.
+- Detects malicious system modifications.
+
+5. **Compliance Monitoring**
+
+- Helps meet regulatory requirements (e.g., PCI DSS, GDPR, HIPAA).
+- Monitors security settings and logs compliance violations.
+
+6. **Incident Response**
+
+- Supports automated responses to threats (e.g., blocking IPs, disabling users).
+- Integrates with SIEM platforms for real-time threat hunting.
+
 
 ## **Wazuh Components**  
 
 There are several components in Wazuh that work together to provide SIEM + XDR capabilities.  
 ![image](https://github.com/user-attachments/assets/1f673a1c-e823-4da8-b0f9-79982e7da7c9)
 
-### **1. Wazuh Manager (Server)**  
+### **1. Wazuh Manager**  
 This is the core of Wazuh. It processes data from agents, applies security rules, and generates alerts. The manager is responsible for log analysis, file integrity monitoring, intrusion detection, and compliance checks.  
 
 ### **2. Wazuh Agents**  
@@ -45,21 +75,21 @@ The system infrastructure for this setup consists of three main components: Wazu
 
 On the attacker side, Kali Linux is used to simulate attacks on DVWA. Kali is loaded with various penetration testing tools like SQLmap, Hydra, and Burp Suite, which help in executing security attacks to evaluate the effectiveness of Wazuh’s monitoring. Wazuh detects and alerts on attacks by analyzing web server logs, system logs, and application logs on the Ubuntu VM.
 -->
-### **Quick Install Wazuh Manager, Dashboard, Indexer etc**  
-The Wazuh Manager is the core component responsible for processing data and generating alerts. Wazuh Dashboard allows you to interact using interactive web interface. 
+### **Quick Installation Wazuh**  
+You can automate the instalation of the central components in Wazuh such as Manager, Dashboard and Indexer. For this tutorial, I want to make it quick and easy by installing Wazuh in single host. You can refer to this website if you want to install each component in different hosts (https://documentation.wazuh.com/current/installation-guide/index.html). 
 
 1. Update your system:
    
    ```bash
    sudo apt update && sudo apt upgrade -y
    ```
-2. Add the Wazuh repository and install the Wazuh Manager. This command will install central components of Wazuh including Manager, Indexer, Dashboard and Filebeat.
+2. Add the Wazuh repository and install the Wazuh components. This command will install central components of Wazuh including Manager, Indexer, Dashboard and Filebeat.
    
    ```bash
    curl -sO https://packages.wazuh.com/4.10/wazuh-install.sh  
    sudo bash wazuh-install.sh -a  
    ```
-3. Access the Wazuh web interface with https://<WAZUH_DASHBOARD_IP_ADDRESS> and your credentials:
+3. Access the Wazuh web interface with `https://<WAZUH_DASHBOARD_IP_ADDRESS>` and your credentials:
    
    ```bash
    INFO: --- Summary ---
@@ -199,6 +229,3 @@ echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b64 -S execve
 
 ![image](https://github.com/user-attachments/assets/fe1e169d-ad4b-4e63-8975-82b76387b48b)
 
-
-## **Wrapping Up**  
-Wazuh is a powerful yet free tool for security monitoring. With its components working together, it provides deep insights into system security, detects threats, and ensures compliance. Once set up, you can start analyzing logs, detecting intrusions, and keeping your infrastructure secure. If you're serious about cybersecurity, Wazuh is definitely worth adding to your toolkit! 🚀
