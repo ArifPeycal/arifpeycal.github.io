@@ -241,7 +241,8 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 1. If you had already run DVWA image, DVWA will now be accessible at: `http://[Ubuntu_VM_IP]/`
 ![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
 
-2. Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:   
+2. Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:
+   
 ```xml
 <localfile>
   <log_format>syslog</log_format>
@@ -277,9 +278,11 @@ You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.
 ```sql
 'UNION SELECT user, password FROM user #
 ```
+
 ![image](https://github.com/user-attachments/assets/399c0cf0-31d4-42cd-9b35-e11875ee17da)
 
 5. Navigate to **Threat Hunting** and monitor the log alerts created by Docker container. You can see some alert about web attack being successfully executed.
+
 ![image](https://github.com/user-attachments/assets/31b0a4ca-b4a4-4bd8-891c-2378722711de)
 
 MITRE ATT&CK page also gives important information about MITRE ATT&CK ID and its TTP.
