@@ -17,32 +17,26 @@ Wazuh is all about helping you monitor your systems for any signs of malicious a
 
 - Monitors system and network activity for suspicious behavior.
 - Uses rules to detect malicious activities, exploits, and unauthorized access.
-
 2. **File Integrity Monitoring (FIM)**
 
 - Detects changes in critical files or directories.
 - Helps detect unauthorized modifications or malware infections.
-
 3. **Log Data Analysis**
 
 - Collects and analyzes system logs, application logs, and network logs.
 - Detects security events like failed logins, privilege escalations, and brute-force attacks.
-
 4. **Malware & Anomaly Detection**
 
 - Scans for rootkits, trojans, and hidden processes.
 - Detects malicious system modifications.
-
 5. **Compliance Monitoring**
 
 - Helps meet regulatory requirements (e.g., PCI DSS, GDPR, HIPAA).
 - Monitors security settings and logs compliance violations.
-
 6. **Incident Response**
 
 - Supports automated responses to threats (e.g., blocking IPs, disabling users).
 - Integrates with SIEM platforms for real-time threat hunting.
-
 
 ## **Wazuh Components**  
 
