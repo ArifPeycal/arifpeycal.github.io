@@ -224,6 +224,7 @@ sudo docker pull vulnerables/web-dvwa
 sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 ```
 3. **Restart the Wazuh manager** to apply changes. Once enabled, the Docker listener monitors events such as:
+   
 | Event Type       | Description | Example Trigger |
 |-----------------|-------------|----------------|
 | **Container Start** | Detects when a container is launched | `docker run -d <container_name>` |
