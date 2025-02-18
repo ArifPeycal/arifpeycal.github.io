@@ -63,12 +63,10 @@ The API allows integration with other security tools and automation of tasks. It
 
 Setting up Wazuh might seem complex at first, but once you break it down, it’s pretty straightforward.  
 
-> Disclaimer: For this blog, I’ll be setting up Wazuh without an agent, well at least not yet. I will just use the Wazuh server to explore and learn some of its functionalities. This is purely for testing and getting familiar with how things work. In the next blog, I’ll go deeper and deploy an agent for full monitoring. Stay tuned!
-<!--
-The system infrastructure for this setup consists of three main components: Wazuh Manager, DVWA (Damn Vulnerable Web Application), and Kali Linux. The Wazuh Manager is installed on an Ubuntu virtual machine (VM) and collects logs from the agents. This Ubuntu VM also hosts DVWA to test security flaws such as SQL Injection, Cross-Site Scripting (XSS), and brute-force attacks.
+> Disclaimer: For this blog, I’ll be setting up Wazuh without an agent, well at least not yet. I will just use the Wazuh server to explore and learn some of its functionalities. This is purely for testing and getting familiar with how things work. 
 
-On the attacker side, Kali Linux is used to simulate attacks on DVWA. Kali is loaded with various penetration testing tools like SQLmap, Hydra, and Burp Suite, which help in executing security attacks to evaluate the effectiveness of Wazuh’s monitoring. Wazuh detects and alerts on attacks by analyzing web server logs, system logs, and application logs on the Ubuntu VM.
--->
+The system infrastructure for this setup consists of three main components: Wazuh Manager, DVWA (Damn Vulnerable Web Application) on Docker, and Kali Linux VM. The Wazuh Manager is installed on an Ubuntu virtual machine (VM) and collects logs from the agents. This Ubuntu VM also hosts DVWA to test security flaws such as SQL Injection, Cross-Site Scripting (XSS), and Local File Inclusion (LFI).
+
 ### **Quick Installation Wazuh**  
 You can automate the instalation of the central components in Wazuh such as Manager, Dashboard and Indexer. For this tutorial, I want to make it quick and easy by installing Wazuh in single host. You can refer to this website if you want to install each component in different hosts (https://documentation.wazuh.com/current/installation-guide/index.html). 
 
