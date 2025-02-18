@@ -223,8 +223,7 @@ sudo docker pull vulnerables/web-dvwa
 ```bash
 sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 ```
-3. **Restart the Wazuh manager** to apply changes. Once enabled, the Docker listener monitors events such as:  
-
+3. **Restart the Wazuh manager** to apply changes. Once enabled, the Docker listener monitors events such as:
 | Event Type       | Description | Example Trigger |
 |-----------------|-------------|----------------|
 | **Container Start** | Detects when a container is launched | `docker run -d <container_name>` |
@@ -234,13 +233,12 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 | **Privileged Mode** | Flags containers running with root privileges | `docker run --privileged` |
 
 4. Navigate to Threat Hunting page and you can see some Docker activities such as Docker container has been started.
-![image](https://github.com/user-attachments/assets/6eca8d16-13b7-48ab-aec6-ae80526b791d)
+![image](https://github.com/user-attachments/assets/6eca8d16-13b7-48ab-aec6-ae80526b791d
 
 #### Monitor DVWA Runtime Logs
 
 1. If you had already run DVWA image, DVWA will now be accessible at: `http://[Ubuntu_VM_IP]/`
 ![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
-
 2. Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:
    
 ```xml
@@ -273,14 +271,15 @@ You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.
 `web-accesslog-docker` decoder will parse relevant fields from the web log, and sets the log type to `web-log` so the Wazuh analysis engine can analyze the log for web attacks. `json` decoder will ensure that Wazuh can parse the log when `web-accesslog-docker` failed to meet the format stated. 
 
 ![image](https://github.com/user-attachments/assets/735d855c-9f95-4588-a756-d14cc9043341)
-
+ 
 4. Demonstrate some `SQLI` attacks using `UNION` query:
+
 ```sql
 'UNION SELECT user, password FROM user #
 ```
 
 ![image](https://github.com/user-attachments/assets/399c0cf0-31d4-42cd-9b35-e11875ee17da)
-
+ 
 5. Navigate to **Threat Hunting** and monitor the log alerts created by Docker container. You can see some alert about web attack being successfully executed.
 
 ![image](https://github.com/user-attachments/assets/31b0a4ca-b4a4-4bd8-891c-2378722711de)
@@ -297,3 +296,4 @@ MITRE ATT&CK page also gives important information about MITRE ATT&CK ID and its
 - XSS using `<script>alert(1)</script>`
   
 ![image](https://github.com/user-attachments/assets/d1db1364-01e7-4f62-8f04-eba1a4facdb0)
+
