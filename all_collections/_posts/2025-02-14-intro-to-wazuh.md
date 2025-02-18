@@ -238,9 +238,9 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 
 #### Monitor DVWA Runtime Logs
 
-1. If you had already run DVWA image, DVWA will now be accessible at: `http://[Ubuntu_VM_IP]/`
+If you had already run DVWA image, DVWA will now be accessible at: `http://[Ubuntu_VM_IP]/`
 ![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
-2. Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:
+Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:
 
    
 ```xml
@@ -251,7 +251,7 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 ```
 You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.log` instead of wildcard (`*`) if you want to be more specific on which container you want to monitor.
 
-3. Add the following decoders to the `/var/ossec/etc/decoders/local_decoder.xml` decoder file on the Wazuh manager:
+Add the following decoders to the `/var/ossec/etc/decoders/local_decoder.xml` decoder file on the Wazuh manager:
 
 ```xml
 <decoder name="web-accesslog-docker">
@@ -274,7 +274,7 @@ You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.
 
 ![image](https://github.com/user-attachments/assets/735d855c-9f95-4588-a756-d14cc9043341)
 
-4. Demonstrate some `SQLI` attacks using `UNION` query:
+Demonstrate some `SQLI` attacks using `UNION` query:
 
 ```sql
 'UNION SELECT user, password FROM user #
@@ -282,14 +282,14 @@ You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.
 
 ![image](https://github.com/user-attachments/assets/399c0cf0-31d4-42cd-9b35-e11875ee17da)
  
-5. Navigate to **Threat Hunting** and monitor the log alerts created by Docker container. You can see some alert about web attack being successfully executed.
+Navigate to **Threat Hunting** and monitor the log alerts created by Docker container. You can see some alert about web attack being successfully executed.
 
 ![image](https://github.com/user-attachments/assets/31b0a4ca-b4a4-4bd8-891c-2378722711de)
 
 MITRE ATT&CK page also gives important information about MITRE ATT&CK ID and its TTP.
 ![image](https://github.com/user-attachments/assets/ef13e40d-9ab4-4a0d-af8f-c2085124ce84)
 
-6. I also tried exploiting `LFI` and `XSS` to see if the default Wazuh rules can detect other types of web attacks:
+I also tried exploiting `LFI` and `XSS` to see if the default Wazuh rules can detect other types of web attacks:
 
 - **LFI** to access `etc/passwd`
 
