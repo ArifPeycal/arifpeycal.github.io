@@ -234,7 +234,7 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 | **Privileged Mode** | Flags containers running with root privileges | `docker run --privileged` |
 
 4. Navigate to Threat Hunting page and you can see some Docker activities such as Docker container has been started.
-![image](https://github.com/user-attachments/assets/6eca8d16-13b7-48ab-aec6-ae80526b791d
+![image](https://github.com/user-attachments/assets/6eca8d16-13b7-48ab-aec6-ae80526b791d)
 
 #### Monitor DVWA Runtime Logs
 
