@@ -95,28 +95,7 @@ You can automate the instalation of the central components in Wazuh such as Mana
 
 You have succesfully installed Wazuh!
 ![image](https://github.com/user-attachments/assets/64f98515-4a48-4cb4-942f-ea6e28b4058f)
-<!--
-### Step 2: Install DVWA (Ubuntu VM)
-We will use Docker to install DVWA quickly.
 
-1. Install Docker & Pull DVWA Image
-```bash
-sudo apt install docker.io -y
-sudo systemctl enable --now docker
-sudo docker pull vulnerables/web-dvwa
-```
-2. Run DVWA in a Docker Container
-```bash
-sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
-```
-3. DVWA will now be accessible at: http://[Ubuntu_VM_IP]/
-
-![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
-
-![image](https://github.com/user-attachments/assets/5350e20f-34b3-4962-86e2-2775235281d8) 
-![image](https://github.com/user-attachments/assets/5155f1b5-de11-4586-aa93-8a403f120951)
--->
----
 
 ## POC
 
@@ -223,3 +202,97 @@ echo "-a exit,always -F auid=1000 -F egid!=994 -F auid!=-1 -F arch=b64 -S execve
 
 ![image](https://github.com/user-attachments/assets/fe1e169d-ad4b-4e63-8975-82b76387b48b)
 
+
+### 3. Monitoring Docker events
+Wazuh provides `<docker-listerner>` module that enables real-time monitoring of Docker events. Docker listener collects and sends these logs to the Wazuh server for analysis and alerting. This module helping detect suspicious activities such as:
+
+- **Container creation, deletion, or modification**
+- **Image downloads (pulls) from untrusted sources**
+- **Privilege escalations within containers**
+
+For this use case, I will try to run DVWA on Docker container to monitor Docker events from user's interaction and web logs using Wazuh.
+
+#### Monitor Docker Events from User's Interaction
+1. Install Docker and Pull DVWA Image
+```bash
+sudo apt install docker.io -y
+sudo systemctl enable --now docker
+sudo docker pull vulnerables/web-dvwa
+```
+
+
+2. Run DVWA in a Docker Container
+```bash
+sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
+```
+3. **Restart the Wazuh manager** to apply changes. Once enabled, the Docker listener monitors events such as:  
+
+| Event Type       | Description | Example Trigger |
+|-----------------|-------------|----------------|
+| **Container Start** | Detects when a container is launched | `docker run -d <container_name>` |
+| **Container Stop** | Detects when a container is stopped | `docker stop <container_id>` |
+| **Container Remove** | Logs container deletions | `docker rm <container_id>` |
+| **Image Pull** | Detects image downloads | `docker pull ubuntu:latest` |
+| **Privileged Mode** | Flags containers running with root privileges | `docker run --privileged` |
+
+4. Navigate to Threat Hunting page and you can see some Docker activities such as Docker container has been started.
+![image](https://github.com/user-attachments/assets/6eca8d16-13b7-48ab-aec6-ae80526b791d)
+
+#### Monitor DVWA Runtime Logs
+
+1. If you had already run DVWA image, DVWA will now be accessible at: `http://[Ubuntu_VM_IP]/`
+![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
+
+2. Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:   
+```xml
+<localfile>
+  <log_format>syslog</log_format>
+  <location>/var/lib/docker/containers/*/*-json.log</location>
+</localfile>
+```
+You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.log` instead of wildcard (`*`) if you want to be more specific on which container you want to monitor.
+
+3. Add the following decoders to the `/var/ossec/etc/decoders/local_decoder.xml` decoder file on the Wazuh manager:
+
+```xml
+<decoder name="web-accesslog-docker">
+  <parent>json</parent>
+  <type>web-log</type>
+  <use_own_name>true</use_own_name>
+  <prematch offset="after_parent">^log":"\S+ \S+ \S+ \.*[\S+ \S\d+] \.*"\w+ \S+ HTTP\S+" \d+</prematch>
+  <regex offset="after_parent">^log":"(\S+) \S+ \S+ \.*[\S+ \S\d+] \.*"(\w+) (\S+) HTTP\S+" (\d+)</regex>
+  <order>srcip,protocol,url,id</order>
+</decoder>
+
+<decoder name="json">
+  <parent>json</parent>
+  <use_own_name>true</use_own_name>
+  <plugin_decoder>JSON_Decoder</plugin_decoder>
+</decoder>
+```
+
+`web-accesslog-docker` decoder will parse relevant fields from the web log, and sets the log type to `web-log` so the Wazuh analysis engine can analyze the log for web attacks. `json` decoder will ensure that Wazuh can parse the log when `web-accesslog-docker` failed to meet the format stated. 
+
+![image](https://github.com/user-attachments/assets/735d855c-9f95-4588-a756-d14cc9043341)
+
+4. Demonstrate some `SQLI` attacks using `UNION` query:
+```sql
+'UNION SELECT user, password FROM user #
+```
+![image](https://github.com/user-attachments/assets/399c0cf0-31d4-42cd-9b35-e11875ee17da)
+
+5. Navigate to **Threat Hunting** and monitor the log alerts created by Docker container. You can see some alert about web attack being successfully executed.
+![image](https://github.com/user-attachments/assets/31b0a4ca-b4a4-4bd8-891c-2378722711de)
+
+MITRE ATT&CK page also gives important information about MITRE ATT&CK ID and its TTP.
+![image](https://github.com/user-attachments/assets/ef13e40d-9ab4-4a0d-af8f-c2085124ce84)
+
+6. I also tried exploiting `LFI` and `XSS` to see if the default Wazuh rules can detect other types of web attacks:
+
+- **LFI** to access `etc/passwd`
+
+![image](https://github.com/user-attachments/assets/2b943273-e830-4277-a14c-e4e281688472)
+
+- XSS using `<script>alert(1)</script>`
+  
+![image](https://github.com/user-attachments/assets/d1db1364-01e7-4f62-8f04-eba1a4facdb0)
