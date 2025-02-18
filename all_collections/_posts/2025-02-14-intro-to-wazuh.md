@@ -53,7 +53,7 @@ Agents are installed on the endpoints like servers, desktops, cloud instances, e
 The indexer stores and indexes security data for efficient searching and analysis.  The Wazuh Indexer is like a huge filing cabinet where all reports are stored and allows users to find past incidents quickly by searching through old reports.
 
 ### **4. Wazuh Dashboard**  
-The dashboard provides a graphical interface for analyzing logs, viewing alerts, and managing security events. It's built on Kibana and offers real-time insights into system security.  
+The dashboard provides a graphical interface for analyzing logs, viewing alerts, and managing security events. 
 
 ### **5. Wazuh API**  
 The API allows integration with other security tools and automation of tasks. It enables users to interact with Wazuh programmatically, retrieve alerts, manage agents, and perform searches.  
