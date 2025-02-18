@@ -240,6 +240,7 @@ sudo docker run --name dvwa -d -p 80:80 vulnerables/web-dvwa
 1. If you had already run DVWA image, DVWA will now be accessible at: `http://[Ubuntu_VM_IP]/`
 ![image](https://github.com/user-attachments/assets/7df28dca-00f6-47b9-a68a-fb5810bc1e10)
 2. Configure Wazuh Manager to forward the logs to Wazuh Manager by adding these configurations to `/var/ossec/etc/ossec.conf`:
+
    
 ```xml
 <localfile>
@@ -271,7 +272,7 @@ You can also use `/var/lib/docker/containers/<CONTAINER_ID>/<CONTAINER_ID>-json.
 `web-accesslog-docker` decoder will parse relevant fields from the web log, and sets the log type to `web-log` so the Wazuh analysis engine can analyze the log for web attacks. `json` decoder will ensure that Wazuh can parse the log when `web-accesslog-docker` failed to meet the format stated. 
 
 ![image](https://github.com/user-attachments/assets/735d855c-9f95-4588-a756-d14cc9043341)
- 
+
 4. Demonstrate some `SQLI` attacks using `UNION` query:
 
 ```sql
