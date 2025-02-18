@@ -35,7 +35,7 @@ Wazuh is all about helping you monitor your systems for any signs of malicious a
   
 6. **Incident Response**
 - Supports automated responses to threats (e.g., blocking IPs, disabling users).
-- Integrates with SIEM platforms for real-time threat hunting.
+- Integrates with third-party API such as VirusTotal for real-time threat hunting.
 
 
 ## **Wazuh Components**  
