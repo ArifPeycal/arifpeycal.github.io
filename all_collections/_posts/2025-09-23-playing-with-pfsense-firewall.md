@@ -5,15 +5,8 @@ date: 2025-09-23 16:26:00
 categories: [pfsense,networking, tutorial]
 ---
 
-In my previous post, I explored Wazuh without an agent, just to get a feel for how things work. Now, it’s time to level up and deploy the Wazuh agent on an **Ubuntu VM** to start monitoring system activities properly. This guide will walk through the setup process step by step.  
+<img width="945" height="554" alt="image" src="https://github.com/user-attachments/assets/4f7aea22-7d40-4c3d-a625-eb2a9d0fec33" />
 
-
-## 🛠 Prerequisites  
-Before we begin, make sure:  
-✅ You have a **Wazuh Manager** running.  
-✅ You have **sudo** privileges on the Ubuntu VM.  
-
-![image](https://github.com/user-attachments/assets/e2188b6f-21c5-42fb-bc00-00dda1b0f50f)
 
 ## Step 1: Install the Wazuh Agent
 First, access the Wazuh Dashboard using `https://WAZUH-MANAGER-IP`, make sure you remember the login credentials. On the Homepage, click the Deploy Agent button and follow the instructions.
