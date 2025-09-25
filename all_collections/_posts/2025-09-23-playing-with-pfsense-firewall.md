@@ -15,7 +15,7 @@ Since hardware firewalls are expensive (and frankly an overkill for a learning e
 
 ### What is pfSense?
 
-<img width="1680" height="840" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
+<img width="654" height="457" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
 
 pfSense is an open-source firewall and router distribution based on FreeBSD. It provides a wide range of enterprise-grade features such as:
 
