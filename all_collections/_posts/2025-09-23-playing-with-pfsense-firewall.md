@@ -74,87 +74,66 @@ ip a
 
 
 Kali VM picks up an IP from pfSense automatically. I also check with dhcpclient to see how the DHCP process work behind the scene. 
-
 <img width="726" height="261" alt="image" src="https://github.com/user-attachments/assets/69259637-4174-43bb-9425-00d197121525" />
 
 
 To double-check, I also looked at the DHCP Leases page in pfSense, and I could see my Kali machine listed there with the IP it got assigned.
+<img width="654" height="457" alt="image" src="https://github.com/user-attachments/assets/8d948f5f-7327-4e3f-ba6d-6c5a30dea367" />
 
-<img width="1165" height="527" alt="image" src="https://github.com/user-attachments/assets/b44757c1-e759-48b1-9a35-b725fa128666" />
+4. Firewall Rules – Controlling Inbound and Outbound Traffic
 
+Now we’re moving to the main feature of a firewall — filtering traffic that goes inbound and outbound through each interface.
 
+The way pfSense (and most firewalls) works is by applying rules. A rule usually defines:
 
-<img width="945" height="554" alt="image" src="https://github.com/user-attachments/assets/4f7aea22-7d40-4c3d-a625-eb2a9d0fec33" />
+- source (where the traffic comes from),
+- destination (where it’s going),
+- port/service being used (like HTTP, HTTPS, SSH, etc.).
 
-<img width="1114" height="205" alt="image" src="https://github.com/user-attachments/assets/f8b74cf2-ea3f-464d-8737-7df77665a8f6" />
+For each rule, you decide whether to allow or block that traffic.
 
+One important thing to remember is that firewall rules are checked from top to bottom. That means the order matters: you should place the most specific rules at the top, and more general rules at the bottom. This way, pfSense knows exactly what to do before it falls back to a default action.
+
+<img width="1001" height="428" alt="image" src="https://github.com/user-attachments/assets/a81132c3-f760-486d-9799-b3eb56255fdc" />
+
+I wanted to test this for myself. So I created a simple scenario:
+
+- Normal behavior: My LAN machine can access websites like httpforever.com over port 80 (HTTP).
+- Test behavior: I add a firewall rule in pfSense to block HTTP (port 80) from the LAN. After applying it, I should see that I can’t load httpforever.com anymore.
+
+### How I Set It Up
+
+1. Logged into pfSense → Firewall > Rules > LAN.
+2. Added a new rule:
+
+- Action: Block
+- Protocol: TCP
+- Source: LAN net (all LAN devices)
+- Destination: Any
+- Destination Port: 80 (HTTP)
+- Moved this rule above the default “Allow LAN to Any” rule (order matters in pfSense — rules are checked top to bottom).
+
+### Testing the Rule
+
+- Before the rule: From my Kali VM, I ran curl http://httpforever.com and got the page content back.
 <img width="1350" height="460" alt="image" src="https://github.com/user-attachments/assets/af0cec11-9a58-4523-97bd-fcef5a113ad4" />
 
-🟢 Step 1: LAN Rules
+- After enabling the rule: Same command gave me no response, and the page wouldn’t load in the browser.
+<img width="945" height="554" alt="image" src="https://github.com/user-attachments/assets/4f7aea22-7d40-4c3d-a625-eb2a9d0fec33" />
 
-Goal: Allow LAN clients → Internet, but not directly to DMZ.
+That proved the rule was working — pfSense saw that my traffic was trying to use port 80 and blocked it. You can also enable the logs for the rules, as you can see several 
+<img width="1114" height="205" alt="image" src="https://github.com/user-attachments/assets/f8b74cf2-ea3f-464d-8737-7df77665a8f6" />
 
-1, Go to Firewall > Rules > LAN.
 
-2. Delete the default “LAN to any” rule.
+### Why This Matters
 
-3. Add rules:
+This small test shows exactly how pfSense can control traffic at a granular level. In a real network security engineer job, you’d use this to:
 
-- Allow LAN → WAN
+- Block risky ports (like SMB or Telnet).
+- Only allow approved applications out to the Internet.
+- Stop malware from “phoning home” by restricting outbound connections.
 
-  - Action: Pass
-  
-  - Interface: LAN
-  
-  - Source: LAN net
-  
-  - Destination: any
-  
-  - Save + Apply
 
-- Block LAN → DMZ
-
-  - Action: Block
-  
-  - Interface: LAN
-  
-  - Source: LAN net
-  
-  - Destination: DMZ net
-  
-  - Save + Apply
-
-✅ LAN can browse internet, but cannot reach DMZ.
-
-🟠 Step 2: DMZ Rules
-
-Goal: Allow DMZ servers → Internet for updates, block DMZ → LAN.
-
-Go to Firewall > Rules > DMZ.
-
-Add rules:
-
-Block DMZ → LAN
-
-Action: Block
-
-Interface: DMZ
-
-Source: DMZ net
-
-Destination: LAN net
-
-Allow DMZ → WAN
-
-Action: Pass
-
-Interface: DMZ
-
-Source: DMZ net
-
-Destination: any
-
-Save + Apply.
 
 ✅ DMZ servers can go out to WAN, but cannot reach LAN.
 <img width="1162" height="307" alt="image" src="https://github.com/user-attachments/assets/44c8099f-f3d1-47f2-904a-b8970a43160a" />
