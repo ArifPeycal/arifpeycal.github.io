@@ -30,8 +30,8 @@ Thanks to its flexibility, pfSense can run not only on dedicated hardware but al
 
 In this project, I set up pfSense inside VMware Workstation to simulate a small enterprise network. The goal is to understand how pfSense works as a firewall and security gateway, and to test different scenarios, including:
 
-1. Firewall as DHCP Server – pfSense provides IP addresses to internal hosts.
-2. Network Segmentation – WAN, LAN, and DMZ setup.
+1. Firewall as DHCP Server 
+2. DMZ setup.
 3. Firewall Rules – controlling inbound and outbound traffic.
 4. Web Server in DMZ – exposing services while keeping LAN secure.
 
@@ -44,6 +44,44 @@ The virtual lab is designed to resemble a typical enterprise network with three 
 - DMZ (Semi-Trusted Zone): Hosts public-facing servers such as a web server or mail server.
 
 ## 3. Firewall as DHCP Server
+When I first played around with pfSense, one of the things I wanted to try was DHCP.  From my previous experience, DHCP usually been done by routers, so it is new knowledge that firewall can also do the same. 
+
+DHCP basically automatically assigns IPs on every machine in the network. This is super useful if you don’t want to bother about asigning new machine IP address by yourseelf. Although in certain case where, static IP is more prefer for critical server that require consistent IP.
+
+So here’s the idea, I configure pfSense to act as the DHCP server for both of these subnet. That way, whenever a new VM boots up, it just asks pfSense for an IP and pfSense will auto assign it based on the remaining address ppol:
+
+- My LAN (192.168.1.0/24): Kali and host Window.
+- My DMZ (192.168.2.0/24): Lubuntu with web server.
+
+### How I Set It Up
+
+1. Log into the pfSense web dashboard.
+2. Go to Services > DHCP Server.
+3. On the LAN tab, tick “Enable DHCP.”
+4. I set the range to something like `192.168.1.100 – 192.168.1.200` (so I know all dynamic clients will sit in that range).
+5. I did the same for the DMZ tab, but with the `192.168.2.100 – 192.168.2.200` range.
+
+That’s it. Now pfSense is ready to hand out addresses automatically.
+
+### Testing It
+
+Once DHCP is enabled, I just start up one of my Linux VMs and run:
+```
+ip a
+```
+
+<img width="897" height="312" alt="image" src="https://github.com/user-attachments/assets/3fa6e2bd-65ba-4440-b54f-7888e57194c4" />
+
+
+Kali VM picks up an IP from pfSense automatically. I also check with dhcpclient to see how the DHCP process work behind the scene. 
+
+<img width="726" height="261" alt="image" src="https://github.com/user-attachments/assets/69259637-4174-43bb-9425-00d197121525" />
+
+
+To double-check, I also looked at the DHCP Leases page in pfSense, and I could see my Kali machine listed there with the IP it got assigned.
+
+<img width="1165" height="527" alt="image" src="https://github.com/user-attachments/assets/b44757c1-e759-48b1-9a35-b725fa128666" />
+
 
 
 <img width="945" height="554" alt="image" src="https://github.com/user-attachments/assets/4f7aea22-7d40-4c3d-a625-eb2a9d0fec33" />
