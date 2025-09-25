@@ -9,11 +9,13 @@ categories: [pfsense,networking, tutorial]
 
 I finally have the opportunity to continue my homelab project. This project was inspired by my internship as a Network Security Intern, where I was exposed to many security tools—especially firewalls. During that time, I realized something important: although I had heard a lot about firewalls, I didn’t actually know how they looked or worked in practice.
 
-My initial assumption was that a firewall was simply software, like the built-in Microsoft Firewall. However, in enterprise environments, a firewall is usually a dedicated networking appliance that sits between different network segments, inspecting and controlling traffic.
+My initial assumption was that a firewall was simply software, like the built-in Microsoft Firewall. However, in enterprise environments, a firewall is usually a dedicated networking component that sits between different network segments.
 
 Since hardware firewalls are expensive (and frankly an overkill for a learning environment), I decided to explore the best open-source alternative available: pfSense.
 
 ### What is pfSense?
+
+<img width="1680" height="840" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
 
 pfSense is an open-source firewall and router distribution based on FreeBSD. It provides a wide range of enterprise-grade features such as:
 
@@ -44,9 +46,7 @@ The virtual lab is designed to resemble a typical enterprise network with three 
 - DMZ (Semi-Trusted Zone): Hosts public-facing servers such as a web server or mail server.
 
 ## 3. Firewall as DHCP Server
-When I first played around with pfSense, one of the things I wanted to try was DHCP.  From my previous experience, DHCP usually been done by routers, so it is new knowledge that firewall can also do the same. 
-
-DHCP basically automatically assigns IPs on every machine in the network. This is super useful if you don’t want to bother about asigning new machine IP address by yourseelf. Although in certain case where, static IP is more prefer for critical server that require consistent IP.
+When I first played around with pfSense, one of the things I wanted to try was DHCP. DHCP basically automatically assigns IPs on every machine in the network. This is super useful if you don’t want to bother about asigning new machine IP address by yourseelf. Although in certain case where, static IP is more prefer for critical server that require consistent IP.
 
 So here’s the idea, I configure pfSense to act as the DHCP server for both of these subnet. That way, whenever a new VM boots up, it just asks pfSense for an IP and pfSense will auto assign it based on the remaining address ppol:
 
