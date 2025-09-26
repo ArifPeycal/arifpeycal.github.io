@@ -7,7 +7,9 @@ categories: [pfsense,networking, tutorial]
 
 ## 1. Introduction
 
-I finally have the opportunity to continue my homelab project. This project was inspired by my internship as a Network Security Intern, where I was exposed to many security tools—especially firewalls. During that time, I realized something important: although I had heard a lot about firewalls, I didn’t actually know how they looked or worked in practice.
+<img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
+
+Finally, have the opportunity to continue my homelab project. This project was inspired by my internship as a Network Security Intern, where I was exposed to many security tools especially firewalls. I realized something important: although I had heard a lot about firewalls, I didn’t actually know how they looked or worked in practice.
 
 My initial assumption was that a firewall was simply software, like the built-in Microsoft Firewall. However, in enterprise environments, a firewall is usually a dedicated networking component that sits between different network segments.
 
@@ -15,16 +17,12 @@ Since hardware firewalls are expensive (and frankly an overkill for a learning e
 
 ### What is pfSense?
 
-<img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
-
 pfSense is an open-source firewall and router distribution based on FreeBSD. It provides a wide range of enterprise-grade features such as:
 
 - Stateful packet filtering firewall
 - Network Address Translation (NAT)
 - VPN (IPsec, OpenVPN, WireGuard)
 - DHCP and DNS services
-- Web-based GUI for easy management
-- Advanced logging and monitoring
 
 Thanks to its flexibility, pfSense can run not only on dedicated hardware but also on virtual machines, which makes it ideal for learning and homelabs.
 
@@ -35,7 +33,6 @@ In this project, I set up pfSense inside VMware Workstation to simulate a small 
 1. Firewall as DHCP Server 
 2. DMZ setup.
 3. Firewall Rules – controlling inbound and outbound traffic.
-4. Web Server in DMZ – exposing services while keeping LAN secure.
 
 ## 2. Network Architecture
 
@@ -50,8 +47,8 @@ When I first played around with pfSense, one of the things I wanted to try was D
 
 So here’s the idea, I configure pfSense to act as the DHCP server for both of these subnet. That way, whenever a new VM boots up, it just asks pfSense for an IP and pfSense will auto assign it based on the remaining address ppol:
 
-- My LAN (192.168.1.0/24): Kali and host Window.
-- My DMZ (192.168.2.0/24): Lubuntu with web server.
+- LAN (192.168.1.0/24): Kali and host Window.
+- DMZ (192.168.2.0/24): Lubuntu with web server.
 
 ### How I Set It Up
 
@@ -133,12 +130,29 @@ This small test shows exactly how pfSense can control traffic at a granular leve
 - Only allow approved applications out to the Internet.
 - Stop malware from “phoning home” by restricting outbound connections.
 
+## 5. DMZ Setup – Isolating Servers from the LAN
 
+In most enterprise networks, we don’t put public-facing servers directly inside the LAN. Instead, we place them in a DMZ (Demilitarized Zone). The DMZ is a middle ground: servers here can talk to the Internet, but they’re isolated from the internal LAN to reduce the risk of lateral movement if the server gets hacked. For my homelab, I created a DMZ network (192.168.2.0/24) and set up a small Lubuntu VM in it. 
 
-✅ DMZ servers can go out to WAN, but cannot reach LAN.
+### How I Set It Up
+
+1. Logged into pfSense → Firewall > Rules > OPT1 (rename into DMZ)
+2. Added a new rule:
+
+- Action: Block
+- Protocol: Any
+- Source: DMZ net
+- Destination: LAN subnet
+- Moved this rule at the top 
+
+### Testing the Rule
+
+Test 1 – Block DMZ → LAN
+
+- From my Lubuntu VM (DMZ), I tried to ping 192.168.1.101 (my Kali machine in the LAN).
 <img width="1162" height="307" alt="image" src="https://github.com/user-attachments/assets/44c8099f-f3d1-47f2-904a-b8970a43160a" />
 
-From DMZ 192.L168.2.10, cannot ping to LAN network in this case I try toi ping the Windo host ip at 192.168.1.101.
+- Result: The traffic was blocked by pfSense. I also checked the firewall logs to confirm the drop.
 <img width="795" height="76" alt="Screenshot 2025-09-24 152927" src="https://github.com/user-attachments/assets/cd48d8a9-064e-439e-9ab8-fb8d3a7064b7" />
 
  
