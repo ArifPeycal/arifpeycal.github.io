@@ -30,9 +30,9 @@ Thanks to its flexibility, pfSense can run not only on dedicated hardware but al
 
 In this project, I set up pfSense inside VMware Workstation to simulate a small enterprise network. The goal is to understand how pfSense works as a firewall and security gateway, and to test different scenarios, including:
 
-1. Firewall as DHCP Server 
-2. DMZ setup.
-3. Firewall Rules – controlling inbound and outbound traffic.
+1. Firewall as DHCP Server
+2. Firewall Rules 
+3. DMZ setup
 
 ## 2. Network Architecture
 
@@ -47,16 +47,15 @@ When I first played around with pfSense, one of the things I wanted to try was D
 
 So here’s the idea, I configure pfSense to act as the DHCP server for both of these subnet. That way, whenever a new VM boots up, it just asks pfSense for an IP and pfSense will auto assign it based on the remaining address ppol:
 
-- LAN (192.168.1.0/24): Kali and host Window.
-- DMZ (192.168.2.0/24): Lubuntu with web server.
+- LAN (192.168.1.0/24): `192.168.1.99 - 192.168.1.200`
+- DMZ (192.168.2.0/24): `192.168.2.10	- 192.168.2.100`
 
 ### How I Set It Up
 
 1. Log into the pfSense web dashboard.
 2. Go to Services > DHCP Server.
 3. On the LAN tab, tick “Enable DHCP.”
-4. I set the range to something like `192.168.1.100 – 192.168.1.200` (so I know all dynamic clients will sit in that range).
-5. I did the same for the DMZ tab, but with the `192.168.2.100 – 192.168.2.200` range.
+4. Set the range of address pool for LAN and DMZ.
 
 That’s it. Now pfSense is ready to hand out addresses automatically.
 
@@ -77,14 +76,13 @@ Kali VM picks up an IP from pfSense automatically. I also check with dhcpclient 
 To double-check, I also looked at the DHCP Leases page in pfSense, and I could see my Kali machine listed there with the IP it got assigned.
 <img width="654" height="457" alt="image" src="https://github.com/user-attachments/assets/8d948f5f-7327-4e3f-ba6d-6c5a30dea367" />
 
-4. Firewall Rules – Controlling Inbound and Outbound Traffic
-
+## 4. Firewall Rules
 Now we’re moving to the main feature of a firewall — filtering traffic that goes inbound and outbound through each interface.
 
 The way pfSense (and most firewalls) works is by applying rules. A rule usually defines:
 
-- source (where the traffic comes from),
-- destination (where it’s going),
+- source 
+- destination 
 - port/service being used (like HTTP, HTTPS, SSH, etc.).
 
 For each rule, you decide whether to allow or block that traffic.
@@ -93,10 +91,7 @@ One important thing to remember is that firewall rules are checked from top to b
 
 <img width="1001" height="428" alt="image" src="https://github.com/user-attachments/assets/a81132c3-f760-486d-9799-b3eb56255fdc" />
 
-I wanted to test this for myself. So I created a simple scenario:
-
-- Normal behavior: My LAN machine can access websites like httpforever.com over port 80 (HTTP).
-- Test behavior: I add a firewall rule in pfSense to block HTTP (port 80) from the LAN. After applying it, I should see that I can’t load httpforever.com anymore.
+I wanted to create a simple rule where all devices in LAN cannot access HTTP website.
 
 ### How I Set It Up
 
@@ -108,8 +103,8 @@ I wanted to test this for myself. So I created a simple scenario:
 - Source: LAN net (all LAN devices)
 - Destination: Any
 - Destination Port: 80 (HTTP)
-- Moved this rule above the default “Allow LAN to Any” rule (order matters in pfSense — rules are checked top to bottom).
-
+- Moved this rule above the default “Allow LAN to Any” rule
+  
 ### Testing the Rule
 
 - Before the rule: From my Kali VM, I ran curl http://httpforever.com and got the page content back.
@@ -122,17 +117,9 @@ That proved the rule was working — pfSense saw that my traffic was trying to u
 <img width="1114" height="205" alt="image" src="https://github.com/user-attachments/assets/f8b74cf2-ea3f-464d-8737-7df77665a8f6" />
 
 
-### Why This Matters
-
-This small test shows exactly how pfSense can control traffic at a granular level. In a real network security engineer job, you’d use this to:
-
-- Block risky ports (like SMB or Telnet).
-- Only allow approved applications out to the Internet.
-- Stop malware from “phoning home” by restricting outbound connections.
-
 ## 5. DMZ Setup – Isolating Servers from the LAN
 
-In most enterprise networks, we don’t put public-facing servers directly inside the LAN. Instead, we place them in a DMZ (Demilitarized Zone). The DMZ is a middle ground: servers here can talk to the Internet, but they’re isolated from the internal LAN to reduce the risk of lateral movement if the server gets hacked. For my homelab, I created a DMZ network (192.168.2.0/24) and set up a small Lubuntu VM in it. 
+In most enterprise networks, we don’t put public-facing servers directly inside the LAN. Instead, we place them in a DMZ (Demilitarized Zone). The DMZ is a middle ground: servers here can talk to the Internet, but they’re isolated from the internal LAN to reduce the risk of lateral movement if the server gets hacked. For my homelab, I created a DMZ network (`192.168.2.0/24`) and set up a small Lubuntu VM in it. 
 
 ### How I Set It Up
 
@@ -141,7 +128,7 @@ In most enterprise networks, we don’t put public-facing servers directly insid
 
 - Action: Block
 - Protocol: Any
-- Source: DMZ net
+- Source: DMZ subnet
 - Destination: LAN subnet
 - Moved this rule at the top 
 
@@ -149,7 +136,7 @@ In most enterprise networks, we don’t put public-facing servers directly insid
 
 Test 1 – Block DMZ → LAN
 
-- From my Lubuntu VM (DMZ), I tried to ping 192.168.1.101 (my Kali machine in the LAN).
+- From my Lubuntu VM (DMZ), I tried to ping `192.168.1.101` (my Kali machine in the LAN).
 <img width="1162" height="307" alt="image" src="https://github.com/user-attachments/assets/44c8099f-f3d1-47f2-904a-b8970a43160a" />
 
 - Result: The traffic was blocked by pfSense. I also checked the firewall logs to confirm the drop.
