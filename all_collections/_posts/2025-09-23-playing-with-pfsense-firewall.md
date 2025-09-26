@@ -131,13 +131,13 @@ In most enterprise networks, we don’t put public-facing servers directly insid
 - Source: DMZ subnet
 - Destination: LAN subnet
 - Moved this rule at the top 
+<img width="1162" height="307" alt="image" src="https://github.com/user-attachments/assets/44c8099f-f3d1-47f2-904a-b8970a43160a" />
 
 ### Testing the Rule
 
 Test 1 – Block DMZ → LAN
 
 - From my Lubuntu VM (DMZ), I tried to ping `192.168.1.101` (my Kali machine in the LAN).
-<img width="1162" height="307" alt="image" src="https://github.com/user-attachments/assets/44c8099f-f3d1-47f2-904a-b8970a43160a" />
 
 - Result: The traffic was blocked by pfSense. I also checked the firewall logs to confirm the drop.
 <img width="795" height="76" alt="Screenshot 2025-09-24 152927" src="https://github.com/user-attachments/assets/cd48d8a9-064e-439e-9ab8-fb8d3a7064b7" />
