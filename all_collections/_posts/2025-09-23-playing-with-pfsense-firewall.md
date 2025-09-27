@@ -8,15 +8,13 @@ categories: [pfsense,networking, tutorial]
 ## 1. Introduction
 <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
 
-Finally, have the opportunity to continue my homelab project. This project was inspired by my internship as a Network Security Intern, where I was exposed to many security tools especially firewalls. I realized something important: although I had heard a lot about firewalls, I didn’t actually know how they looked or worked in practice.
+Finally, have the opportunity to continue my homelab project. This project was inspired by my internship as a Network Security Intern, where I was exposed to many security tools especially firewalls. 
 
-My initial assumption was that a firewall was simply software, like the built-in Microsoft Firewall. However, in enterprise environments, a firewall is usually a dedicated networking component that sits between different network segments.
-
-Since hardware firewalls are expensive (and frankly an overkill for a learning environment), I decided to explore the best open-source alternative available: pfSense.
+So, I want to actually implement one in my homelab. Since hardware firewalls are expensive (and frankly an overkill for a learning environment), I decided to explore the best open-source alternative available: pfSense.
 
 ### What is pfSense?
 
-pfSense is an open-source firewall and router distribution based on FreeBSD. It provides a wide range of enterprise-grade features such as:
+pfSense is an open-source firewall and router distribution based on FreeBSD. It provides a wide range of features such as:
 
 - Stateful packet filtering firewall
 - Network Address Translation (NAT)
