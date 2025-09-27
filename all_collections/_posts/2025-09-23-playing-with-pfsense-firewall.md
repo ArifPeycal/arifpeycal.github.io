@@ -6,7 +6,6 @@ categories: [pfsense,networking, tutorial]
 ---
 
 ## 1. Introduction
-
 <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/3aab24ba-bc5f-4858-b2fe-add872ed98bf" />
 
 Finally, have the opportunity to continue my homelab project. This project was inspired by my internship as a Network Security Intern, where I was exposed to many security tools especially firewalls. I realized something important: although I had heard a lot about firewalls, I didn’t actually know how they looked or worked in practice.
@@ -69,7 +68,7 @@ ip a
 <img width="897" height="312" alt="image" src="https://github.com/user-attachments/assets/3fa6e2bd-65ba-4440-b54f-7888e57194c4" />
 
 
-Kali VM picks up an IP from pfSense automatically. I also check with dhcpclient to see how the DHCP process work behind the scene. 
+Kali VM picks up an IP from pfSense automatically. I also check with `dhclient` to see how the DHCP process work behind the scene. 
 <img width="726" height="261" alt="image" src="https://github.com/user-attachments/assets/69259637-4174-43bb-9425-00d197121525" />
 
 
@@ -88,7 +87,6 @@ The way pfSense (and most firewalls) works is by applying rules. A rule usually 
 For each rule, you decide whether to allow or block that traffic.
 
 One important thing to remember is that firewall rules are checked from top to bottom. That means the order matters: you should place the most specific rules at the top, and more general rules at the bottom. This way, pfSense knows exactly what to do before it falls back to a default action.
-
 <img width="1001" height="428" alt="image" src="https://github.com/user-attachments/assets/a81132c3-f760-486d-9799-b3eb56255fdc" />
 
 I wanted to create a simple rule where all devices in LAN cannot access HTTP website.
