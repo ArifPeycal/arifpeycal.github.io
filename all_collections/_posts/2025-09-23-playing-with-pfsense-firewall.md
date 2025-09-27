@@ -36,6 +36,7 @@ In this project, I set up pfSense inside VMware Workstation to simulate a small 
 ## 2. Network Architecture
 
 The virtual lab is designed to resemble a typical enterprise network with three main zones:
+<img width="699" height="420" alt="image" src="https://github.com/user-attachments/assets/4d9317e9-5466-4140-b958-09e96de08f4f" />
 
 - WAN (Untrusted Zone): Simulates the internet.
 - LAN (Trusted Zone): Represents internal users and workstations.
