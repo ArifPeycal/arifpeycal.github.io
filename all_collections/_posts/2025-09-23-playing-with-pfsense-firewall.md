@@ -133,11 +133,6 @@ In most enterprise networks, we don’t put public-facing servers directly insid
 
 ### Testing the Rule
 
-- From my Lubuntu VM (DMZ), I tried to ping `192.168.1.101` (my Kali machine in the LAN).
-
-- Result: The traffic was blocked by pfSense. 
-<img width="795" height="76" alt="Screenshot 2025-09-24 152927" src="https://github.com/user-attachments/assets/cd48d8a9-064e-439e-9ab8-fb8d3a7064b7" />
-
 To make the exercise more realistic, I simulated an attacker who gained control of a Lubuntu VM in the DMZ. I then compared two cases, DMZ→LAN firewall rules disabled and with a block rule in place. This is to demonstrate how easy it is for an attacker to perform lateral movement into the LAN when segmentation is missing, and how a simple rule can prevent it.
 
 With firewall rules disabled, the attacker on the Lubuntu VM can freely reach hosts on the LAN. For example, a simple `ping` to a LAN device succeeds because pfSense will route packets between subnets when there is no rule blocking them. Running `nmap` from the DMZ shows open SSH services at port 22. 
