@@ -135,11 +135,24 @@ In most enterprise networks, we don’t put public-facing servers directly insid
 
 ### Testing the Rule
 
-Test 1 – Block DMZ → LAN
-
 - From my Lubuntu VM (DMZ), I tried to ping `192.168.1.101` (my Kali machine in the LAN).
 
-- Result: The traffic was blocked by pfSense. I also checked the firewall logs to confirm the drop.
+- Result: The traffic was blocked by pfSense. 
 <img width="795" height="76" alt="Screenshot 2025-09-24 152927" src="https://github.com/user-attachments/assets/cd48d8a9-064e-439e-9ab8-fb8d3a7064b7" />
+
+To make the exercise more realistic, I simulated an attacker who gained control of a Lubuntu VM in the DMZ. I then compared two cases, DMZ→LAN firewall rules disabled and with a block rule in place. This is to demonstrate how easy it is for an attacker to perform lateral movement into the LAN when segmentation is missing, and how a simple rule can prevent it.
+
+With firewall rules disabled, the attacker on the Lubuntu VM can freely reach hosts on the LAN. For example, a simple `ping` to a LAN device succeeds because pfSense will route packets between subnets when there is no rule blocking them. Running `nmap` from the DMZ shows open SSH services at port 22. 
+
+<img width="744" height="198" alt="image" src="https://github.com/user-attachments/assets/eff45b6f-a388-4f59-953e-8eb2fd1eac78" />
+
+
+If the attacker can guess or obtain weak credentials, they can log in to the LAN host. In short, without explicit deny rules, there are nothing that stop lateral movement; in this case a compromise of a public-facing DMZ host can quickly lead to a compromise of internal systems.
+<img width="787" height="381" alt="image" src="https://github.com/user-attachments/assets/7559288b-536a-431d-9e1c-0ef314c7726f" />
+
+
+After enabling the block rule, pfSense drops any packets originating from the DMZ that are destined for the LAN. As a result, you can no longer `ping` the LAN host, `nmap` reports the host as down, and SSH connections time out. 
+<img width="793" height="292" alt="image" src="https://github.com/user-attachments/assets/74159961-a519-4305-bf60-322d5644e912" />
+
 
  
