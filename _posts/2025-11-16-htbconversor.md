@@ -57,13 +57,13 @@ This is immediately suspicious because XSLT is known to allow extended functiona
 #### Source Code Review
 
 User database is stored in users.db. Uploaded XML/XSLT files are saved directly to disk.
-```
+```python
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = '/var/www/conversor.htb/instance/users.db'
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ```
 `resolve_entities=False` disables XXE, but `libxslt` still supports custom extension functions, enabling file read/write and command execution depending on version.
-```
+```python
 parser = etree.XMLParser(resolve_entities=False, no_network=True)
 xml_tree = etree.parse(xml_path, parser)
 xslt_tree = etree.parse(xslt_path)
