@@ -7,6 +7,8 @@ image: 'assets/img/conversor.png'
 
 ---
 
+<link rel="shortcut icon" type="image/png" href="{{ "/assets/img/cat.jpg" }}">
+
 Conversor is an Easy Linux machine focused on XSLT Injection, file write primitives, and abusing cron execution for privilege escalation to a shell. The final privilege escalation uses a clever trick with needrestart to read arbitrary files as root.
 
 <img width="951" height="124" alt="image" src="https://github.com/user-attachments/assets/69ea2223-1c15-447c-85c3-0da67b7c2dd0" />
