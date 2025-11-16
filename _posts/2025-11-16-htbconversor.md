@@ -3,9 +3,14 @@ title: Hack the Box - Conversor
 time: 2025-11-16 12:00:00
 categories: [htb, easy]
 tags: [xlst injection]
+image: <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/57986691-c91f-4e8c-aa1f-6d9c7e9fbc2b" />
+
 ---
 
 Conversor is an Easy Linux machine focused on XSLT Injection, file write primitives, and abusing cron execution for privilege escalation to a shell. The final privilege escalation uses a clever trick with needrestart to read arbitrary files as root.
+
+<img width="951" height="124" alt="image" src="https://github.com/user-attachments/assets/69ea2223-1c15-447c-85c3-0da67b7c2dd0" />
+
 
 ## Recon
 ### Initial Scanning
