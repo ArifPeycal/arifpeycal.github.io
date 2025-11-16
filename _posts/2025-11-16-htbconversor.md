@@ -3,7 +3,7 @@ title: Hack the Box - Conversor
 time: 2025-11-16 12:00:00
 categories: [htb, easy]
 tags: [xlst injection]
-image: <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/57986691-c91f-4e8c-aa1f-6d9c7e9fbc2b" />
+image: 'assets/img/conversor.png'
 
 ---
 
