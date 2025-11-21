@@ -2,7 +2,8 @@
 title: Hack the Box - Expressway
 time: 2025-11-21 12:00:00
 categories: [htb, easy]
-tags: [ipsec]
+tags: [ipsec, sudo]
+image: 'assets/img/expressway.png'
 
 ---
 
