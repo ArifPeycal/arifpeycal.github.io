@@ -2,7 +2,7 @@
 title: Hack the Box - Conversor
 time: 2025-11-16 12:00:00
 categories: [htb, easy]
-tags: [xlst injection]
+tags: [xlst injection, hashcat, sudo]
 image: 'assets/img/conversor.png'
 
 ---
