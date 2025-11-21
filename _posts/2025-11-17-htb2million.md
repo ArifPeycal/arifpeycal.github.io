@@ -2,6 +2,8 @@
 title: Hack the Box - TwoMillion
 time: 2025-11-17 12:00:00
 categories: [htb, easy]
+tags: [api enumeration, command injection, overlayfs]
+
 image: 'assets/img/2million.png'
 
 ---
