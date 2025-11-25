@@ -4,6 +4,7 @@ time: 2025-11-21 12:00:00
 categories: [htb, easy]
 tags: [xlst injection]
 published: false
+hidden: true
 ---
 
 ## Recon
