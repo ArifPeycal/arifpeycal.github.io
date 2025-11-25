@@ -3,6 +3,7 @@ title: Portswigger Labs
 time: 2025-11-25 12:00:00
 categories: [portswigger]
 tags: [sqli]
+image: 'assets/img/portswigger.png'
 ---
 
 ## SQLi (SQL Injection)
@@ -46,7 +47,7 @@ AND released = 1
 ```
 To view unreleased products, we must remove the `AND released = 1` clause.
 
-### Comments in SQL
+#### Comments in SQL
 
 SQL supports inline comments and most SQL engines accept `--` to comment out the rest of the line.
 
