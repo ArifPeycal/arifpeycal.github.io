@@ -71,7 +71,7 @@ SELECT * FROM products WHERE category = 'Lifestyle'' OR 1=1-- ' AND released = 1
 Eventhough the category is invalid due to extra quote, the payload `OR 1=1` makes the query returns true hence retrieve all data.
 <img width="1416" height="738" alt="image" src="https://github.com/user-attachments/assets/3d9658c8-6be1-470a-8ea1-4a0c2291bf68" />
 
-## Lab 02: SQL injection vulnerability allowing login bypass
+### Lab 02: SQL injection vulnerability allowing login bypass
 >  This lab contains a SQL injection vulnerability in the login function.
 > 
 > Goal: Perform a SQL injection attack that logs in to the application as the administrator user.
@@ -96,3 +96,79 @@ SELECT * FROM users
 WHERE username = 'administrator'-- ' 
   AND password = 'test123';
 ```
+
+#### Lab 03: SQL injection attack, querying the database type and version on Oracle
+
+> This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
+>
+> Goal: Display the database version string. 
+
+#### Recon
+We start by testing the category parameter for SQL injection.
+
+- A single quote `'` breaks the query → error.
+- Double quotes `''` restore query syntax → confirms injectable field.
+- Adding a SQL comment such as `--` makes the backend ignore the rest of the query.
+
+This indicates that we can inject our own SQL in the category parameter.
+  
+#### Exploitation
+
+To extract data from other tables than the original table in query, we need to use a UNION SELECT injection. But UNION queries must follow strict rules:
+
+- Both SELECT statements must return the same number of columns.
+- The data types of corresponding columns must be compatible.
+
+Therefore, we must determine:
+
+- How many columns are returned by the original query.
+- Which data types we can inject.
+
+A common way to check column count is:
+```
+' UNION SELECT null--
+```
+<img width="1396" height="745" alt="image" src="https://github.com/user-attachments/assets/bf687aaa-7611-499e-9656-4d683022914f" />
+
+However, Oracle requires a FROM clause. To resolve this, we query from Oracle’s built-table which is `dual`:
+```
+' UNION SELECT null from dual--
+```
+<img width="1365" height="622" alt="image" src="https://github.com/user-attachments/assets/bc2794f9-23c2-42eb-8caf-bee8a418ae56" />
+
+Still gives an error? It is likely column count mismatch.
+
+Next, try two columns:
+```
+' UNION SELECT null, null from dual--
+```
+This time the page loads successfully, meaning the original query returns 2 columns.
+
+<img width="1405" height="538" alt="image" src="https://github.com/user-attachments/assets/74d8cf0e-2f70-45e4-9fee-02a20fdff42f" />
+
+We can query two columns from the table, but we must ensure the data types match the original query’s expected column types. If we try to inject a value with the wrong data type, Oracle will return an error. For example:
+```
+' UNION SELECT 'A', 1 FROM dual--
+```
+<img width="1347" height="490" alt="image" src="https://github.com/user-attachments/assets/a3971501-20b3-4920-93d4-b05415a4c2be" />
+
+This results in an error because one of the columns expects a string, but we supplied an integer.
+
+To verify the correct data types, we replace the integer with either a string or NULL. Since the following payload works without errors, we can conclude that both columns accept string data:
+```
+' UNION SELECT 'A', NULL FROM dual--
+```
+
+<img width="1393" height="543" alt="image" src="https://github.com/user-attachments/assets/8da1e8f9-bb0d-44ab-9be5-a206cbff2587" />
+
+
+Since the description already states the DB is Oracle, we can use `v$version` table that stores version information.
+
+The column we need is banner.
+```
+' UNION SELECT banner, null FROM v$version--
+```
+
+<img width="1401" height="651" alt="image" src="https://github.com/user-attachments/assets/2fc6b5a0-ee4b-47ec-8e43-d19f89367d76" />
+
+
