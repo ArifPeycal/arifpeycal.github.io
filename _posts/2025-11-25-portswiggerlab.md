@@ -8,7 +8,7 @@ image: 'assets/img/portswigger.png'
 
 ## SQLi (SQL Injection)
 
-### Lab 01: SQL injection vulnerability in WHERE clause allowing retrieval of hidden data
+### Lab 01: SQLi in WHERE clause allowing retrieval of hidden data
 >  This lab contains a SQL injection vulnerability in the product category filter. When the user selects a category, the application carries out a SQL query like the following:
 > `SELECT * FROM products WHERE category = 'Gifts' AND released = 1`
 > 
@@ -71,7 +71,7 @@ SELECT * FROM products WHERE category = 'Lifestyle'' OR 1=1-- ' AND released = 1
 Eventhough the category is invalid due to extra quote, the payload `OR 1=1` makes the query returns true hence retrieve all data.
 <img width="1416" height="738" alt="image" src="https://github.com/user-attachments/assets/3d9658c8-6be1-470a-8ea1-4a0c2291bf68" />
 
-### Lab 02: SQL injection vulnerability allowing login bypass
+### Lab 02: SQLi allowing login bypass
 >  This lab contains a SQL injection vulnerability in the login function.
 > 
 > Goal: Perform a SQL injection attack that logs in to the application as the administrator user.
@@ -97,7 +97,7 @@ WHERE username = 'administrator'-- '
   AND password = 'test123';
 ```
 
-### Lab 03: SQL injection attack, querying the database type and version on Oracle
+### Lab 03: Querying the database type and version on Oracle
 
 > This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
 >
@@ -172,7 +172,7 @@ The column we need is banner.
 <img width="1401" height="651" alt="image" src="https://github.com/user-attachments/assets/2fc6b5a0-ee4b-47ec-8e43-d19f89367d76" />
 
 
-### Lab 04: SQL injection attack, querying the database type and version on MySQL and Microsoft
+### Lab 04: Querying the database type and version on MySQL and Microsoft
 
 > This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
 > 
@@ -202,7 +202,7 @@ Now, we have all information that we need to craft the payload. We can use `@@ve
 <img width="1405" height="738" alt="image" src="https://github.com/user-attachments/assets/20bdc7c9-bd2a-4a36-83aa-8a5e282f0016" />
 
 
-### Lab 05: SQL injection attack, listing the database contents on non-Oracle databases
+### Lab 05: Listing the database contents on non-Oracle databases
 
 > The application has a login function, and the database contains a table that holds usernames and passwords. You need to determine the name of this table and the columns it
 > contains, then retrieve the contents of the table to obtain the username and password of all users.
@@ -212,7 +212,7 @@ Now, we have all information that we need to craft the payload. We can use `@@ve
 #### Recon
 The setup is similar to previous labs, so we already know the column required and which database that we are using.
 
-##### Exploitation
+#### Exploitation
 We can see all contents inside the database using `information_schema`, this include any tables and any columns inside a table. We can refer to <a href="https://www.postgresql.org/docs/current/infoschema-tables.html">PostgreSQL documentation</a> for list of available columns inside `information_schema`. 
 
 We can use `table_name` column to see all tables available.
@@ -234,7 +234,7 @@ List out all username and password from `users_nflxix`.
 ```
 <img width="1384" height="706" alt="image" src="https://github.com/user-attachments/assets/c2ec2185-7a5f-4c1e-b0d9-9747ec86d626" />
 
-### Lab 06: SQL injection UNION attack, retrieving multiple values in a single column
+### Lab 06: Retrieving multiple values in a single column
 
 > The database contains a different table called users, with columns called username and password.
 >
