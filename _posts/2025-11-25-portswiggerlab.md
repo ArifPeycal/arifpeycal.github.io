@@ -3,7 +3,7 @@ title: Portswigger Labs
 time: 2025-11-25 12:00:00
 categories: [portswigger]
 tags: [sqli]
-image: 'assets/img/conversor.png'
+image: 'assets/img/portswigger.png'
 ---
 
 ## SQLi (SQL Injection)
@@ -14,7 +14,7 @@ image: 'assets/img/conversor.png'
 > 
 > Goal: Perform a SQL injection attack that causes the application to display one or more unreleased products.
 
-### Recon
+#### Recon
 
 The vulnerable parameter is the **category** value.
 A simple test is to insert a **single quote `'`** after the category value and observe the application’s response.
@@ -38,7 +38,7 @@ category = 'Gifts' '' AND released = 1
 
 This confirms that the category parameter is vulnerable to SQL injection.
 
-### Exploitation
+#### Exploitation
 
 The page only displays **released** products because of this condition:
 
@@ -47,7 +47,7 @@ AND released = 1
 ```
 To view unreleased products, we must remove the `AND released = 1` clause.
 
-#### Comments in SQL
+##### Comments in SQL
 
 SQL supports inline comments and most SQL engines accept `--` to comment out the rest of the line.
 
@@ -76,7 +76,7 @@ Eventhough the category is invalid due to extra quote, the payload `OR 1=1` make
 > 
 > Goal: Perform a SQL injection attack that logs in to the application as the administrator user.
 
-### Recon
+#### Recon
 Since we didnt have the source code, we can assume that it will be a typical vulnerable login form like this
 ```sql
 SELECT * FROM users 
@@ -85,7 +85,7 @@ WHERE username = '<USER_INPUT>'
 ```
 Both the username and password fields are placed directly into the SQL query without proper sanitization. This means we can inject SQL syntax through the username field and bypass the password check entirely.
 
-### Exploitation
+#### Exploitation
 Since we know the username is `administrator`, we want to craft input that comments out the password check. We can use this payload:
 ```
 administrator'-- 
