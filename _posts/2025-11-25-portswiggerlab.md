@@ -3,7 +3,7 @@ title: Portswigger Labs
 time: 2025-11-25 12:00:00
 categories: [portswigger]
 tags: [sqli]
-image: 'assets/img/portswigger.png'
+image: 'assets/img/conversor.png'
 ---
 
 ## SQLi (SQL Injection)
