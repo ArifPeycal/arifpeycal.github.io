@@ -277,3 +277,54 @@ Use `||` to concatenate 2 strings, and you can use any delimiter to distinguish 
 ```
 <img width="1387" height="718" alt="image" src="https://github.com/user-attachments/assets/f7222dcd-d1ee-48ee-906b-30a440cd8275" />
 
+
+### Lab 07: Blind SQLi with conditional responses
+
+> This lab contains a blind SQL injection vulnerability. The application uses a tracking cookie for analytics, and performs a SQL query containing the value of the submitted cookie.
+>
+> The results of the SQL query are not returned, and no error messages are displayed. But the application includes a Welcome back message in the page if the query returns any rows.
+>
+> The database contains a different table called users, with columns called username and password. You need to exploit the blind SQL injection vulnerability to find out the password of the
+> administrator user.
+>
+> Goal: Log in as the administrator user.
+
+#### Recon
+
+
+For this lab, `TrackingID` cookie is being queried and compared with the data in database. Usually cookies are being used to track preferences of user when they revisit the website and sometimes it's being used for personalization content. This include showing things like "Welcome back, [user]" etc.
+
+Normally, we can see "Welcome back" is shown in the homepage. 
+<img width="1398" height="547" alt="image" src="https://github.com/user-attachments/assets/65922102-eecb-4119-a46f-ca411e042f2d" />
+
+Adding a single quote will produces a normal page but no “Welcome back” message. The appended quote caused the SQL query to fail or return zero rows.
+
+```sql
+TrackingId=4ccPz7UW4IuCqicf'
+```
+<img width="1404" height="549" alt="image" src="https://github.com/user-attachments/assets/3838c70f-b250-46c0-b88e-2a57483c8892" />
+
+Commenting the rest of query will show "Welcome back" message again. 
+```
+TrackingId=4ccPz7UW4IuCqicf'--
+```
+
+To verify that Boolean-based injection works, we append a true condition like `1=1`. The Welcome back message appears which means condition is true. We can now test database conditions by substituting 1=1 with SQL expressions that evaluate to true/false.
+```
+TrackingId=4ccPz7UW4IuCqicf' AND 1=1--
+```
+We check whether the administrator user exists. If the message appears, the administrator exists as expected.
+```sql
+TrackingId=cNwUOjEs3mWPCEtS' AND (SELECT 1 FROM users WHERE username='administrator')=1--
+```
+<img width="1374" height="541" alt="image" src="https://github.com/user-attachments/assets/6021efbb-3e69-4b5a-87cc-17f2e4dfa0bf" />
+
+We test the password length using `LENGTH()` function. By adjusting the numeric condition (e.g., `<10`, `=20`, `>15`), we can search the exact length.
+```sql
+TrackingId=cNwUOjEs3mWPCEtS' AND (SELECT 1 FROM users WHERE username='administrator' AND LENGTH(password)<30)=1--
+```
+We now brute-force each character of admin's password. By using Burp Intruder and Grep-Match, we can brute those characters one by one and check which character returns "Welcome back" text. Repeat the process until you can find the whole password.
+```sql
+TrackingId=cNwUOjEs3mWPCEtS' AND SUBSTR((SELECT password FROM users WHERE username='administrator'), 1, 1)='f'--
+```
+<img width="1555" height="615" alt="image" src="https://github.com/user-attachments/assets/e42ee6db-ccd2-4dd2-8521-3153163315c5" />
