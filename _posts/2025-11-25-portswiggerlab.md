@@ -172,3 +172,31 @@ The column we need is banner.
 <img width="1401" height="651" alt="image" src="https://github.com/user-attachments/assets/2fc6b5a0-ee4b-47ec-8e43-d19f89367d76" />
 
 
+### Lab 04: SQL injection attack, querying the database type and version on MySQL and Microsoft
+
+> This lab contains a SQL injection vulnerability in the product category filter. You can use a UNION attack to retrieve the results from an injected query.
+> 
+> Goal: Display the database version string. 
+
+#### Recon
+Do the intial testing using quotes and comments. Upon testing, `--` double dash comment didnt work this time. According to <a href="https://portswigger.net/web-security/sql-injection/cheat-sheet">Portswigger cheatsheat</a>, it is possible that database is MySQL which uses ` --` and `#` as comment.
+
+<img width="1399" height="502" alt="image" src="https://github.com/user-attachments/assets/925fca20-1c46-4b73-ba9e-52370b9e0a6a" />
+
+Do the same enumeration for column numbers and data types. Since this is not Oracle, you dont require to include FROM clause to check the column amounts.
+```
+' UNION SELECT null,null#
+```
+
+Same as previous lab, we have 2 columns. Both of columns will return string.
+```
+' UNION SELECT '1','2'#
+```
+<img width="1386" height="709" alt="image" src="https://github.com/user-attachments/assets/a2b4c0a7-8745-4da3-ba86-853c2a7a51cc" />
+
+##### Exploitation
+Now, we have all information that we need to craft the payload. We can use `@@version` to display database version for MySQL.
+```
+' UNION SELECT @@version,'2'#
+```
+<img width="1405" height="738" alt="image" src="https://github.com/user-attachments/assets/20bdc7c9-bd2a-4a36-83aa-8a5e282f0016" />
